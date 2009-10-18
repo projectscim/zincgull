@@ -1,4 +1,4 @@
-#summary zincgull-wikipage
+#summary zincgull wikihome
 #labels Featured,Phase-Requirements,Phase-Implementation
 
 = Introduction =
