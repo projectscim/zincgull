@@ -1,0 +1,41 @@
+#summary Description of classes and functions
+#labels Featured,Phase-Implementation
+
+== Server ==
+  * I/O
+      * chat
+      * coordinates
+      * actions
+      * friends
+
+  * NPC, hp, title, lvl, koordinater[]
+      * Friendly
+          * Questgivers, questid
+          * Storeowners, storetype
+      * Enemy, damage, armor, melee/range, hostile, spawntime
+          * (boss, resistances)
+
+  * Playerdata
+
+  * Maps
+      * koordinater
+      * årstider
+
+  * Store
+      * melee
+      * range
+      * food
+
+  * Quest
+
+== Client ==
+
+  * I/O
+      * chat
+      * coordinates
+      * actions
+      * friends
+
+  * Grafik
+      * animations
+      * mapgraphics 
