@@ -23,6 +23,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private boolean[] keyDown = new boolean[4];
 	
 	public void init() {
+		this.setSize(800, 600);
       	this.addKeyListener(this);
 		tim.addActionListener(this);
 		tim.start();
