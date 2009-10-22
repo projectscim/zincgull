@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.ImageIcon;
-//import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -23,9 +22,9 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private boolean[] keyDown = new boolean[4];
 	
 	public GameArea() {
-		this.setSize(800, 600);
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
+      	this.setDoubleBuffered(true);
 		tim.addActionListener(this);
 		tim.start();
 		this.requestFocus();
