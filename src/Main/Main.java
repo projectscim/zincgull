@@ -10,6 +10,7 @@ public class Main {
 		System.out.println("lol");
 		System.out.println("lulz");
 		System.out.println("heman kan skriva nu!");
+		System.out.println("heman kan skriva igen!");
 	}
 
 }
