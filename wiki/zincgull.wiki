@@ -1,5 +1,5 @@
 #summary zincgull wikihome
-#labels Featured,Phase-Requirements,Phase-Implementation
+#labels Featured
 
 = Introduction =
 
