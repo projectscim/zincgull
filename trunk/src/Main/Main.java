@@ -17,10 +17,10 @@ public class Main extends Applet implements ActionListener, KeyListener{
 	private ImageIcon sprite=new ImageIcon("images//zincgull.png");
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
-	private int xpos=20;
-	private int ypos=20;
-	private int speed=1;
-	private boolean[] keyDown=new boolean[4];
+	private int xpos = 20;
+	private int ypos = 20;
+	private int speed = 1;
+	private boolean[] keyDown = new boolean[4];
 	
 	public void init() {
 		width = getSize().width;
@@ -30,7 +30,6 @@ public class Main extends Applet implements ActionListener, KeyListener{
 		tim.addActionListener(this);
 		tim.start();
 		this.requestFocus();
-		System.out.println("lulz igen");
 	}
 
 	public void paint( Graphics g ) {
