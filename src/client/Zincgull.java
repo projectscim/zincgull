@@ -14,6 +14,7 @@ public class Zincgull extends JApplet implements MouseListener{
 	public void init() {		
 		this.add(new Sidebar(), BorderLayout.EAST);
 		this.add(new GameArea());
+		this.addMouseListener(this);
 	}
 	
 	public void paint(Graphics g) {
@@ -30,10 +31,12 @@ public class Zincgull extends JApplet implements MouseListener{
 
 	public void mouseEntered(MouseEvent e) {
 		setMouseActive(true);
+		repaint();
 	}
 
 	public void mouseExited(MouseEvent e) {
 		setMouseActive(false);
+		repaint();
 	}
 	
 	@Override
