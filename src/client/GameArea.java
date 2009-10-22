@@ -14,7 +14,7 @@ import javax.swing.Timer;
 public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private static final long serialVersionUID = -5572295459928673608L;
 	
-	URL url = getClass().getResource("images/zincgull.png");
+	URL url = getClass().getResource("../images/zincgull.png");
 	private ImageIcon sprite = new ImageIcon(url);
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
@@ -29,13 +29,14 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
       	this.setDoubleBuffered(true);
 		tim.addActionListener(this);
 		tim.start();
-		this.requestFocus();
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
-		this.requestFocus();
+		if(Zincgull.isMouseActive()){
+			this.requestFocus();
+		}
 	}
 
 	public void keyPressed(KeyEvent e) {
