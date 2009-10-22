@@ -7,10 +7,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.ImageIcon;
-import javax.swing.JApplet;
+//import javax.swing.JApplet;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class GameArea extends JApplet implements ActionListener, KeyListener{
+public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private static final long serialVersionUID = -5572295459928673608L;
 	
 	private ImageIcon sprite=new ImageIcon("images//zincgull.png");
