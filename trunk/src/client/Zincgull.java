@@ -12,8 +12,6 @@ public class Zincgull extends JApplet{
 		this.setSize(800, 600);
 		
 		this.add(game);
-		
-		this.setVisible(true);
 	}
 	
 	public void paint(Graphics g) {
