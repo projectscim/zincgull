@@ -22,16 +22,17 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private int speed = 1;
 	private boolean[] keyDown = new boolean[4];
 	
-	public void init() {
+	public GameArea() {
 		this.setSize(800, 600);
       	this.addKeyListener(this);
+      	this.setBackground(Color.WHITE);
 		tim.addActionListener(this);
 		tim.start();
 		this.requestFocus();
 	}
 
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		g.drawImage(sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
 		this.requestFocus();
 	}
