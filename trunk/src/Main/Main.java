@@ -14,10 +14,10 @@ public class Main extends Applet implements ActionListener, KeyListener{
 	private static final long serialVersionUID = 7197415241156375302L;
 	int width, height;
 
-	private ImageIcon sprite=new ImageIcon("images//mudkip.jpg");
+	private ImageIcon sprite=new ImageIcon("images//zincgull.png");
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
-	private int xpos=250;
+	private int xpos=20;
 	private int ypos=20;
 	private int speed=1;
 	private boolean[] keyDown=new boolean[4];
@@ -25,11 +25,8 @@ public class Main extends Applet implements ActionListener, KeyListener{
 	public void init() {
 		width = getSize().width;
 		height = getSize().height;
-		setBackground( Color.black );
 		
       	this.addKeyListener(this);
-		this.setBackground(Color.BLACK);
-		//this.setDoubleBuffered(true);
 		tim.addActionListener(this);
 		tim.start();
 		this.requestFocus();
@@ -38,7 +35,7 @@ public class Main extends Applet implements ActionListener, KeyListener{
 
 	public void paint( Graphics g ) {
 		super.paint(g);
-		g.drawImage(sprite.getImage(), xpos-turned*250, ypos, turned*500, 500, null);
+		g.drawImage(sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
 		this.requestFocus();
 	}
 
