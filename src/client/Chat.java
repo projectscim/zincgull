@@ -87,6 +87,7 @@ public class Chat extends JPanel implements Runnable {
 			while (true) {
 				String message = dis.readUTF();		//read
 				chatOutput.append( getTime()+": "+message+"\n" );	//print
+				System.out.println( getTime()+": "+message );	//print
 			}
 		} catch( IOException ie ) { 
 			System.out.println( ie );
