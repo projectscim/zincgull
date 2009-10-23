@@ -12,10 +12,8 @@ public class Zincgull extends JApplet implements MouseListener{
 	private static boolean mouseActive = false;
 	
 	public void init() {	
-		this.setSize(800, 600);
-		
 		this.add(new Sidebar(), BorderLayout.EAST);
-		this.add(new Chat("90.230.92.182",1337), BorderLayout.SOUTH);
+		this.add(new Chat(), BorderLayout.SOUTH);
 		this.add(new GameArea(), BorderLayout.CENTER);
 		this.addMouseListener(this);
 	}
