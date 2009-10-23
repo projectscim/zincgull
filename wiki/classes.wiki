@@ -3,12 +3,12 @@
 
 == Server ==
   * I/O
-      * chat
-      * coordinates
-      * actions
+      * chat, HERMAN
+      * coordinates, HERMAN
+      * actions, ANDREAS
       * friends
 
-  * NPC, hp, title, lvl, koordinater[]
+  * NPC, hp, title, lvl, koordinater[], ANDREAS
       * Friendly
           * Questgivers, questid
           * Storeowners, storetype
@@ -17,23 +17,23 @@
 
   * Playerdata
 
-  * Maps
+  * Maps, HERMAN
       * koordinater
       * årstider
 
-  * Store
+  * Store, TOBIAS
       * melee
       * range
       * food
 
-  * Quest
+  * Quest, ANDREAS
 
 == Client ==
 
   * I/O
-      * chat
-      * coordinates
-      * actions
+      * chat, HERMAN
+      * coordinates, HERMAN
+      * actions, ANDREAS
       * friends
 
   * Grafik
