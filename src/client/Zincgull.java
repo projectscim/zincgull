@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.swing.JApplet;
 
@@ -25,6 +28,12 @@ public class Zincgull extends JApplet implements MouseListener{
 	
 	public void paint(Graphics g) {
 		super.paint(g);
+	}
+	
+	public static String getTime(){
+		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+		Date date = new GregorianCalendar().getTime();
+		return time.format(date);
 	}
 
 	public static void setMouseActive(boolean mouseActive) {

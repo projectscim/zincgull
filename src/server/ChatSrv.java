@@ -2,6 +2,7 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.text.DateFormat;
 import java.util.*;
 
 public class ChatSrv {
@@ -19,19 +20,19 @@ public class ChatSrv {
 		try {
 			new ChatSrv( 49050 );	//create server
 		} catch (IOException e) {
-			System.out.println( "ERR -> Something failed");
+			System.out.println( getTime()+": ERR -> Something failed");
 			e.printStackTrace();
 		}
 	}
 	
 	private void listen( int port ) throws IOException {
 		ss = new ServerSocket( port );
-		System.out.println( "INF -> Started the Zincgull chatserver on port "+port);
-		System.out.println( "    --> listening on "+ss );
+		System.out.println( getTime()+": INF -> Started the Zincgull chatserver on port "+port);
+		System.out.println( "              --> listening on "+ss );
 		
 		while (true) {	//accepting connections forever
 			Socket s = ss.accept();		//grab a connection
-			System.out.println( "USR -> New connection from "+s );	//msg about the new connection
+			System.out.println( getTime()+": USR -> New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
 			dos.writeUTF("Welcome to the Zincgull chatserver!");
 			outputStreams.put( s, dos );		//saving the stream
@@ -50,7 +51,7 @@ public class ChatSrv {
 				try {
 					dos.writeUTF( message );		//and send message
 				} catch( IOException ie ) { 
-					System.out.println( ie ); 		//failmsg
+					System.out.println( getTime()+": "+ie ); 		//failmsg
 				}
 			}
 		}
@@ -58,15 +59,20 @@ public class ChatSrv {
 	
 	void removeConnection( Socket s ) {		//run when connection is discovered dead
 		synchronized( outputStreams ) {		//dont mess up sendToAll
-			System.out.println( "USR -> Lost connection from "+s );
+			System.out.println( getTime()+": USR -> Lost connection from "+s );
 			outputStreams.remove( s );
 			try {
 				s.close();
 			} catch( IOException ie ) {
-				System.out.println( "ERR -> Error closing "+s );
+				System.out.println( getTime()+": ERR -> Error closing "+s );
 				ie.printStackTrace();
 			}
 		}
+	}
+	public static String getTime(){
+		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+		Date date = new GregorianCalendar().getTime();
+		return time.format(date);
 	}
 }
 
