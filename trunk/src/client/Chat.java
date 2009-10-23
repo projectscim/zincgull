@@ -4,9 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import javax.swing.*;
 
 public class Chat extends JPanel implements Runnable {
@@ -54,7 +51,7 @@ public class Chat extends JPanel implements Runnable {
 			chatInput.setText( "" );		//clear inputfield
 		} catch( IOException ie ) { 
 			System.out.println( ie ); 
-			chatOutput.append( "Can't send message.\n" );
+			chatOutput.append( Zincgull.getTime()+": Can't send message\n" );
 		}
 	}
 	
@@ -73,8 +70,8 @@ public class Chat extends JPanel implements Runnable {
 			} catch( IOException e ) { 
 				System.out.println( e );
 				if(first){
-					System.out.println( "First time tried failed\n" );	//debug
-					chatOutput.append("Can't connect to server, but trying to reconnect.\n");
+					//System.out.println( "First time tried failed\n" );	//debug, unnecessary
+					chatOutput.append(Zincgull.getTime()+": Can't connect to server, but trying to reconnect\n");
 					first = false;
 				}
 			}
@@ -86,19 +83,15 @@ public class Chat extends JPanel implements Runnable {
 		try {
 			while (true) {
 				String message = dis.readUTF();		//read
-				chatOutput.append( getTime()+": "+message+"\n" );	//print
-				System.out.println( getTime()+": "+message );	//print
+				chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
+				//System.out.println( getTime()+": "+message );	//debug
 			}
 		} catch( IOException ie ) { 
-			System.out.println( ie );
-			chatOutput.append("Connection reset, trying to reconnect\n");
+			//System.out.println( ie );	//debug, not necessary with below line
+			chatOutput.append(Zincgull.getTime()+": Connection reset, trying to reconnect\n");
 			connectServer(false);
 		}
 	}
 	
-	public String getTime(){
-		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
-		Date date = new GregorianCalendar().getTime();
-		return time.format(date);
-	}
+	
 }
