@@ -17,9 +17,16 @@ public class Chat extends Panel implements Runnable {
 	// from the socket
 	private DataOutputStream dout;
 	private DataInputStream din;
+	private InetAddress ip;
 	// Constructor
 	public Chat( String host, int port ) {
 		ta.setEditable(false);
+		try {
+			ip = Inet4Address.getByName(host);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		// Set up the screen
 		setLayout( new BorderLayout() );
 		add( "North", tf );
@@ -37,7 +44,7 @@ public class Chat extends Panel implements Runnable {
 		// Connect to the server
 		try {
 			// Initiate the connection
-			socket = new Socket( host, port );
+			socket = new Socket( ip, port );
 			// We got a connection! Tell the world
 			System.out.println( "connected to "+socket );
 			// Let's grab the streams and create DataInput/Output streams
