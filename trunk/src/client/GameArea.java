@@ -18,8 +18,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
 	private ImageIcon sprite = new ImageIcon(url);
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
-	private int xpos = 20;
-	private int ypos = 20;
+	private int xpos = 80;
+	private int ypos = 50;
 	private int speed = 1;
 	private boolean[] keyDown = new boolean[4];
 	

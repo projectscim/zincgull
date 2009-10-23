@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Chat extends Panel implements Runnable {
 	private static final long serialVersionUID = -6395460343649750082L;
@@ -14,14 +17,16 @@ public class Chat extends Panel implements Runnable {
 	private DataOutputStream dos;
 	private DataInputStream dis;
 	
-	private String host = "localhost";
+	private String host, nickname;
 	private int port = 49050;
 	
-	public Chat() {		
+	public Chat(String serverAddress, String nick) {		
 		chatOutput.setEditable(false);
 		this.setLayout( new BorderLayout() );
 		this.add( "North", chatInput );
 		this.add( "Center", chatOutput );
+		this.host = serverAddress;
+		this.nickname = nick;
 		
 		// We want to receive messages when someone types a line
 		// and hits return, using an anonymous class as
@@ -37,15 +42,15 @@ public class Chat extends Panel implements Runnable {
 		//_ISSUE: client wont start until server is started...
 		connectServer(true);	//try to connect, "true" because its the first time
 	}
-	
+
 	//handles everything that gets typed by the user
 	private void processMessage( String message ) {
 		try {
-			dos.writeUTF( message );		//send
+			dos.writeUTF( nickname+": "+message );		//send
 			chatInput.setText( "" );		//clear inputfield
 		} catch( IOException ie ) { 
 			System.out.println( ie ); 
-			chatOutput.append( "Can't send message" );
+			chatOutput.append( "Can't send message.\n" );
 		}
 	}
 	
@@ -57,11 +62,14 @@ public class Chat extends Panel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
+				dos.writeUTF( nickname );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
 			} catch( IOException e ) { 
+				System.out.println( e );
 				if(first){
+					System.out.println( "First time tried failed\n" );	//debug
 					chatOutput.append("Can't connect to server, but trying to reconnect.\n");
 					first = false;
 				}
@@ -74,11 +82,18 @@ public class Chat extends Panel implements Runnable {
 		try {
 			while (true) {
 				String message = dis.readUTF();		//read
-				chatOutput.append( message+"\n" );	//print
+				chatOutput.append( getTime()+": "+message+"\n" );	//print
 			}
 		} catch( IOException ie ) { 
+			System.out.println( ie );
 			chatOutput.append("Connection reset, trying to reconnect\n");
 			connectServer(false);
 		}
+	}
+	
+	public String getTime(){
+		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+		Date date = new GregorianCalendar().getTime();
+		return time.format(date);
 	}
 }

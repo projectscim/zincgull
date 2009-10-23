@@ -3,6 +3,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 public class ChatSrv {
 	private ServerSocket ss;
 	//this is used to dont have to creata a DOS everytime you are writing to a stream
@@ -14,8 +15,13 @@ public class ChatSrv {
 	}
 	
 	// Usage: java Server <port>
-	static public void main( String args[] ) throws Exception {
-		new ChatSrv( 49050 );		//create server
+	static public void main( String args[] ){
+		try {
+			new ChatSrv( 49050 );	//create server
+		} catch (IOException e) {
+			System.out.println( "ERR -> Something failed");
+			e.printStackTrace();
+		}
 	}
 	
 	private void listen( int port ) throws IOException {
@@ -25,6 +31,7 @@ public class ChatSrv {
 		
 		while (true) {	//accepting connections forever
 			Socket s = ss.accept();		//grab a connection
+//			getNickname(s);				//get the nickname from the socket
 			System.out.println( "USR -> New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
 			dos.writeUTF("Welcome to the Zincgull chatserver!");
