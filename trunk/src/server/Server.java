@@ -9,7 +9,7 @@ public class Server {
 	// A mapping from sockets to DataOutputStreams. This will
 	// help us avoid having to create a DataOutputStream each time
 	// we want to write to a stream.
-	private Hashtable outputStreams = new Hashtable();
+	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
 	
 	// Constructor and while-accept loop all in one.
 	public Server( int port ) throws IOException {
@@ -21,13 +21,13 @@ public class Server {
 		// Create the ServerSocket
 		ss = new ServerSocket( port );
 		// Tell the world we're ready to go
-		System.out.println( "Listening on "+ss );
+		System.out.println( "INF -> Now listening on "+ss );
 		// Keep accepting connections forever
 		while (true) {
 			// Grab the next incoming connection
 			Socket s = ss.accept();
 			// Tell the world we've got it
-			System.out.println( "Connection from "+s );
+			System.out.println( "USR -> New connection from "+s );
 			// Create a DataOutputStream for writing data to the
 			// other side
 			DataOutputStream dout = new DataOutputStream( s.getOutputStream() );
@@ -40,7 +40,7 @@ public class Server {
 	}
 	// Get an enumeration of all the OutputStreams, one for each client
 	// connected to us
-	Enumeration getOutputStreams() {
+	Enumeration<DataOutputStream> getOutputStreams() {
 		return outputStreams.elements();
 	}
 	
@@ -51,7 +51,7 @@ public class Server {
 		// as we tried to walk through the list
 		synchronized( outputStreams ) {
 		// For each client ...
-			for (Enumeration e = getOutputStreams(); e.hasMoreElements(); ) {
+			for (Enumeration<?> e = getOutputStreams(); e.hasMoreElements(); ) {
 				// ... get the output stream ...
 				DataOutputStream dout = (DataOutputStream)e.nextElement();
 				// ... and send the message
@@ -72,14 +72,14 @@ public class Server {
 		// down the list of all output streamsa
 		synchronized( outputStreams ) {
 			// Tell the world
-			System.out.println( "Removing connection to "+s );
+			System.out.println( "USR -> Lost connection from "+s );
 			// Remove it from our hashtable/list
 			outputStreams.remove( s );
 			// Make sure it's closed
 			try {
 				s.close();
 			} catch( IOException ie ) {
-				System.out.println( "Error closing "+s );
+				System.out.println( "ERR -> Error closing "+s );
 				ie.printStackTrace();
 			}
 		}
@@ -89,9 +89,10 @@ public class Server {
 	// Usage: java Server <port>
 	static public void main( String args[] ) throws Exception {
 		// Get the port # from the command line
-		int port = 1337 /*Integer.parseInt( args[0] )*/;
+		int port = 49050 /*Integer.parseInt( args[0] )*/;
 		// Create a Server object, which will automatically begin
 		// accepting connections.
+		System.out.println( "INF -> Starting the Zincgull chatserver on port "+port);
 		new Server( port );
 	}
 }

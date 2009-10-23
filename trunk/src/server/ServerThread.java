@@ -29,7 +29,7 @@ public class ServerThread extends Thread {
 			//... read the next message ...
 			String message = din.readUTF();
 			//... tell the world ...
-			System.out.println( "Sending "+message );
+			System.out.println( "MSG -> Mesage sent from "+socket+"\n    --> "+message );
 			//... and have the server send it to all clients
 			server.sendToAll( message );
 			}
