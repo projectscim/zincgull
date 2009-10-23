@@ -1,6 +1,5 @@
 package client;
 
-//import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -8,76 +7,78 @@ import java.net.*;
 
 public class Chat extends Panel implements Runnable {
 	private static final long serialVersionUID = -6395460343649750082L;
-	// Components for the visual display of the chat windows
-	private TextField tf = new TextField();
-	private TextArea ta = new TextArea();
-	// The socket connecting us to the server
-	private Socket socket;
-	// The streams we communicate to the server; these come
-	// from the socket
-	private DataOutputStream dout;
-	private DataInputStream din;
-	// Constructor
-	public Chat() {
-		ta.setEditable(false);
-		// Set up the screen
-		setLayout( new BorderLayout() );
-		add( "North", tf );
-		add( "Center", ta );
+	private TextField chatInput = new TextField();
+	private TextArea chatOutput = new TextArea();
+
+	private Socket socket;		//socket connecting to server
+	private DataOutputStream dos;
+	private DataInputStream dis;
+	
+	private String host = "localhost";
+	private int port = 49050;
+	
+	public Chat() {		
+		chatOutput.setEditable(false);
+		this.setLayout( new BorderLayout() );
+		this.add( "North", chatInput );
+		this.add( "Center", chatOutput );
+		
 		// We want to receive messages when someone types a line
 		// and hits return, using an anonymous class as
 		// a callback
-		tf.addActionListener( 
+		chatInput.addActionListener( 
 			new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
 					processMessage( e.getActionCommand() );
 				}
 			} 
 		);
-		// Connect to the server
+		this.setVisible(true);
+		//_ISSUE: client wont start until server is started...
+		connectServer(true);	//try to connect, "true" because its the first time
+	}
+	
+	//handles everything that gets typed by the user
+	private void processMessage( String message ) {
 		try {
-			// Initiate the connection
-			socket = new Socket("localhost", 49050);
-			// We got a connection! Tell the world
-			System.out.println( "connected to "+socket );
-			// Let's grab the streams and create DataInput/Output streams
-			// from them
-			din = new DataInputStream( socket.getInputStream() );
-			dout = new DataOutputStream( socket.getOutputStream() );
-			// Start a background thread for receiving messages
-			new Thread( this ).start();
+			dos.writeUTF( message );		//send
+			chatInput.setText( "" );		//clear inputfield
 		} catch( IOException ie ) { 
 			System.out.println( ie ); 
-			ta.append( "Connection failed" );
+			chatOutput.append( "Can't send message" );
 		}
 	}
 	
-	// Gets called when the user types something
-	private void processMessage( String message ) {
-		try {
-			// Send it to the server
-			dout.writeUTF( message );
-			// Clear out text input field
-			tf.setText( "" );
-		} catch( IOException ie ) { 
-			System.out.println( ie ); 
-			ta.append( "Can't send message" );
+	public void connectServer(boolean first){
+		boolean reconnect = true;
+		while (reconnect) {
+			try {
+				socket = new Socket(host, port);
+				//create streams for communication
+				dis = new DataInputStream( socket.getInputStream() );
+				dos = new DataOutputStream( socket.getOutputStream() );
+				// Start a background thread for receiving messages
+				new Thread( this ).start();		//starts run()-method
+				reconnect = false;
+			} catch( IOException e ) { 
+				if(first){
+					chatOutput.append("Can't connect to server, but trying to reconnect.\n");
+					first = false;
+				}
+			}
 		}
 	}
-		
-	// Background thread runs this: show messages from other window
+	
+	//keep receiving messages from the server
 	public void run() {
 		try {
-			// Receive messages one-by-one, forever
 			while (true) {
-				// Get the next message
-				String message = din.readUTF();
-				// Print it to our text window
-				ta.append( message+"\n" );
+				String message = dis.readUTF();		//read
+				chatOutput.append( message+"\n" );	//print
 			}
 		} catch( IOException ie ) { 
-			System.out.println( ie );
-			ta.append( "Connection reset" );
+			chatOutput.append("Connection reset, trying to reconnect\n");
+			connectServer(false);
 		}
 	}
 }
