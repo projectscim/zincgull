@@ -62,7 +62,7 @@ public class Chat extends Panel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( nickname );		//say hello to server containing username
+				dos.writeUTF( "-> "+nickname+" joined" );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
