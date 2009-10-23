@@ -7,11 +7,12 @@ import java.net.*;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.swing.*;
 
-public class Chat extends Panel implements Runnable {
+public class Chat extends JPanel implements Runnable {
 	private static final long serialVersionUID = -6395460343649750082L;
-	private TextField chatInput = new TextField();
-	private TextArea chatOutput = new TextArea();
+	private JTextField chatInput = new JTextField();
+	private TextArea chatOutput = new TextArea();	//not a JTextArea due to bad scroll-support
 
 	private Socket socket;		//socket connecting to server
 	private DataOutputStream dos;
@@ -22,6 +23,9 @@ public class Chat extends Panel implements Runnable {
 	
 	public Chat(String serverAddress, String nick) {		
 		chatOutput.setEditable(false);
+		chatOutput.setBackground(Color.BLACK);
+		chatOutput.setForeground(Color.GREEN);
+		
 		this.setLayout( new BorderLayout() );
 		this.add( "North", chatInput );
 		this.add( "Center", chatOutput );

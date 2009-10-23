@@ -31,7 +31,6 @@ public class ChatSrv {
 		
 		while (true) {	//accepting connections forever
 			Socket s = ss.accept();		//grab a connection
-//			getNickname(s);				//get the nickname from the socket
 			System.out.println( "USR -> New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
 			dos.writeUTF("Welcome to the Zincgull chatserver!");
