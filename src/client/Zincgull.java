@@ -11,9 +11,12 @@ public class Zincgull extends JApplet implements MouseListener{
 	private static final long serialVersionUID = 7197415241156375302L;
 	private static boolean mouseActive = false;
 	
-	public void init() {		
+	public void init() {	
+		this.setSize(800, 600);
+		
 		this.add(new Sidebar(), BorderLayout.EAST);
-		this.add(new GameArea());
+		this.add(new Chat("localhost",1337), BorderLayout.SOUTH);
+		this.add(new GameArea(), BorderLayout.CENTER);
 		this.addMouseListener(this);
 	}
 	
