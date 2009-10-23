@@ -37,7 +37,7 @@ public class Chat extends Panel implements Runnable {
 		// Connect to the server
 		try {
 			// Initiate the connection
-			socket = new Socket("localhost", 1337);
+			socket = new Socket("localhost", 49050);
 			// We got a connection! Tell the world
 			System.out.println( "connected to "+socket );
 			// Let's grab the streams and create DataInput/Output streams
@@ -61,6 +61,7 @@ public class Chat extends Panel implements Runnable {
 			tf.setText( "" );
 		} catch( IOException ie ) { 
 			System.out.println( ie ); 
+			ta.append( "Can't send message" );
 		}
 	}
 		
@@ -76,6 +77,7 @@ public class Chat extends Panel implements Runnable {
 			}
 		} catch( IOException ie ) { 
 			System.out.println( ie );
+			ta.append( "Connection reset" );
 		}
 	}
 }
