@@ -52,8 +52,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener{
 	public void keyTyped(KeyEvent e) {}
 
 	public void actionPerformed(ActionEvent e) {
-		calculateMove();
-		repaint();	
+		if(Zincgull.isMouseActive()){
+			calculateMove();
+			repaint();	
+		}
 	}
 
 	private void calculateMove() {
