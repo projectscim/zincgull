@@ -7,9 +7,9 @@ import java.util.*;
 
 public class ChatSrv {
 	private ServerSocket ss;
-	//this is used to dont have to creata a DOS everytime you are writing to a stream
+	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
-	private int people = 0;
+	private static int people = 0;
 	
 	// Constructor and while-accept loop
 	public ChatSrv( int port ) {
@@ -28,15 +28,14 @@ public class ChatSrv {
 	
 	private void listen( int port ) throws IOException {
 		ss = new ServerSocket( port );
-		System.out.println( "INF "+getTime()+": Started the Zincgull chatserver on port "+port);
-		System.out.println( "              listening on "+ss );
+		System.out.println( "INF "+getTime()+": Started the Zincgull chatserver on port "+port+"\n              listening on "+ss );
 		
 		while (true) {	//accepting connections forever
 			Socket s = ss.accept();		//grab a connection
 			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
-			people++;
-			dos.writeUTF("Welcome to the Zincgull chatserver! Online: "+people);
+			setPeople(getPeople() + 1);
+			dos.writeUTF("Welcome to the Zincgull chatserver!");
 			outputStreams.put( s, dos );		//saving the stream
 			new ChatSrvThread( this, s );		//create a new thread for the stream
 		}
@@ -59,13 +58,13 @@ public class ChatSrv {
 		}
 	}
 	
-	void removeConnection( Socket s ) {		//run when connection is discovered dead
+	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
 		synchronized( outputStreams ) {		//dont mess up sendToAll
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
 			outputStreams.remove( s );
-			people--;	//one less online
-			if(people == 0) System.out.println( "INF "+getTime()+": No users online" );
-			sendToAll("<- someone left, "+people+" left online");	//tell everyone that someone left
+			setPeople(getPeople() - 1);	//one less online
+			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
+			sendToAll("<- "+username+" left, "+getPeople()+" left online");	//tell everyone that someone left
 			try {
 				s.close();
 			} catch( IOException ie ) {
@@ -78,6 +77,14 @@ public class ChatSrv {
 		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		Date date = new GregorianCalendar().getTime();
 		return time.format(date);
+	}
+
+	public void setPeople(int people) {
+		ChatSrv.people = people;
+	}
+
+	public static int getPeople() {
+		return people;
 	}
 }
 
