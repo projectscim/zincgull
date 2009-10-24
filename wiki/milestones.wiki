@@ -6,14 +6,14 @@ Two clients can connect to the server and chat with each other. Although they ca
 
 == Requirements ==
 === Server ===
-  * Up and running.
-  * Handle the ingame-chat.
+  * ~~Up and running.~~
+  * ~~Handle the ingame-chat.~~
   * Communicate how the map looks like.
 
 === Client ===
   * Available online at a website as an applet.
-  * Possible for two clients to connect and chat with each other.
-  * Have an animated player-controlled character.
+  * ~~Possible for two clients to connect and chat with each other.~~
+  * ~~Have an animated player-controlled character.~~
   * Get map-info from the server and show it with the clients mapdata.
 
 == Schedule ==
