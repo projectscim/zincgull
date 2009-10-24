@@ -17,7 +17,7 @@ public class ChatSrvThread extends Thread {
 			DataInputStream din = new DataInputStream( socket.getInputStream() );	//gets messages from client
 			while (true) {
 			String message = din.readUTF();
-			System.out.println( ChatSrv.getTime()+": MSG -> Mesage sent from "+socket+"\n              --> "+message );
+			System.out.println( "MSG "+ChatSrv.getTime()+": Mesage sent from "+socket+"\n              "+message );
 			server.sendToAll( message );
 			}
 		} catch( EOFException ie ) {		//no failmsg

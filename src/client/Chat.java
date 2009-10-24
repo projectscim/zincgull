@@ -35,7 +35,9 @@ public class Chat extends JPanel implements Runnable {
 		chatInput.addActionListener( 
 			new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
-					processMessage( e.getActionCommand() );
+					if( !e.getActionCommand().equals(null) ){
+						processMessage( e.getActionCommand() );
+					}
 				}
 			} 
 		);
