@@ -5,6 +5,8 @@ import java.net.*;
 public class ChatSrvThread extends Thread {
 	private ChatSrv server;
 	private Socket socket;
+	
+	private String username;
 
 	public ChatSrvThread( ChatSrv server, Socket socket ) {
 		this.server = server;
@@ -14,17 +16,23 @@ public class ChatSrvThread extends Thread {
 
 	public void run() {	
 		try {
-			DataInputStream din = new DataInputStream( socket.getInputStream() );	//gets messages from client
+			DataInputStream dis = new DataInputStream( socket.getInputStream() );	//gets messages from client
 			while (true) {
-			String message = din.readUTF();
-			System.out.println( "MSG "+ChatSrv.getTime()+": Mesage sent from "+socket+"\n              "+message );
-			server.sendToAll( message );
+			String message = dis.readUTF();
+			if( message.substring(0, 2).equals("->")){
+				username = message.substring(3);
+				System.out.println( "              username is \""+username+"\"" );
+				server.sendToAll( "-> "+username+" joined, "+ChatSrv.getPeople()+" users online");
+			}else{
+				System.out.println( "MSG "+ChatSrv.getTime()+": Message from "+socket+"\n              "+message );
+				server.sendToAll( message );
+			}
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
 			// ie.printStackTrace();		//optional failmsg, mostly annoying red text
 		} finally {
-			server.removeConnection( socket );	//closing socket when connection is lost
+			server.removeConnection( socket, username );	//closing socket when connection is lost
 		}
 	}
 }

@@ -35,7 +35,11 @@ public class Chat extends JPanel implements Runnable {
 		chatInput.addActionListener( 
 			new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
-					if( !e.getActionCommand().equals(null) ){
+					// checks if msg is a special command, else if !null then send msg
+					/*if( e.getActionCommand().substring(0, 5).equals("/nick") ){
+						processMessage( "changed name to "+e.getActionCommand().substring(6) );
+						nickname = e.getActionCommand().substring(6);
+					}else */if( !e.getActionCommand().equals(null) ){
 						processMessage( e.getActionCommand() );
 					}
 				}
@@ -65,12 +69,12 @@ public class Chat extends JPanel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "-> "+nickname+" joined" );		//say hello to server containing username
+				dos.writeUTF( "-> "+nickname );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
 			} catch( IOException e ) { 
-				System.out.println( e );
+				//System.out.println( e ); //unnecessary reconnection failed message
 				if(first){
 					//System.out.println( "First time tried failed\n" );	//debug, unnecessary
 					chatOutput.append(Zincgull.getTime()+": Can't connect to server, but trying to reconnect\n");
