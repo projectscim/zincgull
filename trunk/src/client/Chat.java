@@ -35,11 +35,7 @@ public class Chat extends JPanel implements Runnable {
 		chatInput.addActionListener( 
 			new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
-					// checks if msg is a special command, else if !null then send msg
-					/*if( e.getActionCommand().substring(0, 5).equals("/nick") ){
-						processMessage( "changed name to "+e.getActionCommand().substring(6) );
-						nickname = e.getActionCommand().substring(6);
-					}else */if( !e.getActionCommand().equals(null) ){
+					if( !e.getActionCommand().equals(null) ){	//make sure it's not null
 						processMessage( e.getActionCommand() );
 					}
 				}
@@ -69,7 +65,7 @@ public class Chat extends JPanel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "-> "+nickname );		//say hello to server containing username
+				dos.writeUTF( "/nick "+nickname );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -89,8 +85,10 @@ public class Chat extends JPanel implements Runnable {
 		try {
 			while (true) {
 				String message = dis.readUTF();		//read
-				chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
-				//System.out.println( getTime()+": "+message );	//debug
+				if( !specialCommand(message) ){
+					chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
+					//System.out.println( getTime()+": "+message );	//debug
+				}
 			}
 		} catch( IOException ie ) { 
 			//System.out.println( ie );	//debug, not necessary with below line
@@ -99,5 +97,13 @@ public class Chat extends JPanel implements Runnable {
 		}
 	}
 	
+	//to check if it's a special command
+	public boolean specialCommand( String msg ){
+		if( msg.substring(0, 2).equals("/s")){
+
+			return true;
+		}		
+		return false;
+	}
 	
 }

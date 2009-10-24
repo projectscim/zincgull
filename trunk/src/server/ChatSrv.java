@@ -36,18 +36,18 @@ public class ChatSrv {
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
 			setPeople(getPeople() + 1);
 			dos.writeUTF("Welcome to the Zincgull chatserver!");
-			outputStreams.put( s, dos );		//saving the stream
+			getOutputStreams().put( s, dos );		//saving the stream
 			new ChatSrvThread( this, s );		//create a new thread for the stream
 		}
 	}
 	// Enumerate all OutputStreams
-	Enumeration<DataOutputStream> getOutputStreams() {
-		return outputStreams.elements();
+	Enumeration<DataOutputStream> enumOutputStreams() {
+		return getOutputStreams().elements();
 	}
 
 	void sendToAll( String message ) {
-		synchronized( outputStreams ) {		//sync so that no other thread screws this one over
-			for (Enumeration<?> e = getOutputStreams(); e.hasMoreElements(); ) {
+		synchronized( getOutputStreams() ) {		//sync so that no other thread screws this one over
+			for (Enumeration<?> e = enumOutputStreams(); e.hasMoreElements(); ) {
 				DataOutputStream dos = (DataOutputStream)e.nextElement();		//get all outputstreams
 				try {
 					dos.writeUTF( message );		//and send message
@@ -59,9 +59,9 @@ public class ChatSrv {
 	}
 	
 	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
-		synchronized( outputStreams ) {		//dont mess up sendToAll
+		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
-			outputStreams.remove( s );
+			getOutputStreams().remove( s );
 			setPeople(getPeople() - 1);	//one less online
 			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
 			sendToAll("<- "+username+" left, "+getPeople()+" left online");	//tell everyone that someone left
@@ -73,6 +73,11 @@ public class ChatSrv {
 			}
 		}
 	}
+	
+	public void listClients(){
+		
+	}
+	
 	public static String getTime(){
 		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		Date date = new GregorianCalendar().getTime();
@@ -85,6 +90,14 @@ public class ChatSrv {
 
 	public static int getPeople() {
 		return people;
+	}
+
+	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
+		this.outputStreams = outputStreams;
+	}
+
+	public Hashtable<Socket, DataOutputStream> getOutputStreams() {
+		return outputStreams;
 	}
 }
 
