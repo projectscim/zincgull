@@ -17,14 +17,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private int port = 49051;	//mapserver-port
 	private Timer tim = new Timer(10,this);
 	
-//	private int id = (int) (Zincgull.random*1000000);
-	private int id = 1;
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	
 	public GameArea() {
-
-		player.add(0, new Player());
-		player.add(id, new Player());
+		player.add(new Player(Zincgull.random));
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
@@ -36,7 +32,9 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(player.get(id).sprite.getImage(), player.get(id).xpos-player.get(id).turned*28, player.get(id).ypos, player.get(id).turned*76, 56, null);
+		for (int i = 0; i < player.size(); i++) {
+			g.drawImage(player.get(i).sprite.getImage(), player.get(i).xpos-player.get(i).turned*28, player.get(i).ypos, player.get(i).turned*76, 56, null);
+		}
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
 		}
@@ -51,12 +49,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 					String[] temp;
 					temp = coords.split(":");
 					if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
-						//int tmp = Integer.parseInt(temp[4])*100000;
-						int tmp = 1;
-						player.get(tmp).xpos = Integer.parseInt(temp[0]);
-						player.get(tmp).ypos = Integer.parseInt(temp[1]);
-						player.get(tmp).turned = Integer.parseInt(temp[2]);
-						player.get(tmp).speed = Integer.parseInt(temp[3]);
+						player.get(getId(Double.valueOf(temp[4]))).xpos = Integer.parseInt(temp[0]);
+						player.get(getId(Double.valueOf(temp[4]))).ypos = Integer.parseInt(temp[1]);
+						player.get(getId(Double.valueOf(temp[4]))).turned = Integer.parseInt(temp[2]);
+						player.get(getId(Double.valueOf(temp[4]))).speed = Integer.parseInt(temp[3]);
 						repaint();
 					}
 				}
@@ -69,7 +65,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void sendData() {
 		try {
-			dos.writeUTF( player.get(id).xpos +":"+ player.get(id).ypos +":"+ player.get(id).turned +":"+ player.get(id).speed +":"+ Zincgull.random);
+			dos.writeUTF( player.get(getId(Zincgull.random)).xpos +":"+ player.get(getId(Zincgull.random)).ypos +":"+ player.get(getId(Zincgull.random)).turned +":"+ player.get(getId(Zincgull.random)).speed +":"+ Zincgull.random);
 		} catch( IOException ie ) { 
 			//Chat.chatOutput.append( Zincgull.getTime()+": MAP: Can't send coordinates\n" );
 		}
@@ -83,7 +79,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/HELLO "+Zincgull.random );		//say hello to server containing username
+				//dos.writeUTF( "/HELLO "+Zincgull.random );		//say hello to server containing username
+				dos.writeUTF( "/HELLO "+player.get(getId(Zincgull.random)).xpos +":"+ player.get(getId(Zincgull.random)).ypos +":"+ player.get(getId(Zincgull.random)).turned +":"+ player.get(getId(Zincgull.random)).speed +":"+ Zincgull.random);
 				// Start a background thread for receiving coordinates
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -98,21 +95,39 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		}
 	}
 	
+	public static Player getPlayer(Double d){
+		for (int i = 0; i < player.size(); i++) {
+			if( player.get(i).id == d ){	//needs to be unique
+				return player.get(i);
+			}
+		}
+		return player.get(getId(Zincgull.random));
+	}
+	
+	public static int getId(Double d){
+		for (int i = 0; i < player.size(); i++) {
+			if( player.get(i).id == d ){	//needs to be unique
+				return i;
+			}
+		}
+		return 0;
+	}
+	
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40){
-			player.get(id).arrowDown[40-e.getKeyCode()]=true;
+			player.get(getId(Zincgull.random)).arrowDown[40-e.getKeyCode()]=true;
 		}
 	}
 	
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40)
-			player.get(id).arrowDown[40-e.getKeyCode()]=false;
+			player.get(getId(Zincgull.random)).arrowDown[40-e.getKeyCode()]=false;
 	}
 
 	public void keyTyped(KeyEvent e) {}
 
 	public void actionPerformed(ActionEvent e) {
-		if (Zincgull.isMouseActive()&&(player.get(id).arrowDown[0]||player.get(id).arrowDown[1]||player.get(id).arrowDown[2]||player.get(id).arrowDown[3])) {
+		if (Zincgull.isMouseActive()&&(player.get(getId(Zincgull.random)).arrowDown[0]||player.get(getId(Zincgull.random)).arrowDown[1]||player.get(getId(Zincgull.random)).arrowDown[2]||player.get(getId(Zincgull.random)).arrowDown[3])) {
 			sendData();
 			calculateMove();
 			repaint();	
@@ -120,28 +135,38 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	}
 
 	private void calculateMove() {
-		if(player.get(id).arrowDown[0]){
-			player.get(id).ypos=player.get(id).ypos+player.get(id).speed;
+		if(player.get(getId(Zincgull.random)).arrowDown[0]){
+			player.get(getId(Zincgull.random)).ypos=player.get(getId(Zincgull.random)).ypos+player.get(getId(Zincgull.random)).speed;
 		}
-		if(player.get(id).arrowDown[1]){
-			player.get(id).xpos=player.get(id).xpos+player.get(id).speed;
-			player.get(id).turned = 1;
+		if(player.get(getId(Zincgull.random)).arrowDown[1]){
+			player.get(getId(Zincgull.random)).xpos=player.get(getId(Zincgull.random)).xpos+player.get(getId(Zincgull.random)).speed;
+			player.get(getId(Zincgull.random)).turned = 1;
 		}
-		if(player.get(id).arrowDown[2]){
-			player.get(id).ypos=player.get(id).ypos-player.get(id).speed;
+		if(player.get(getId(Zincgull.random)).arrowDown[2]){
+			player.get(getId(Zincgull.random)).ypos=player.get(getId(Zincgull.random)).ypos-player.get(getId(Zincgull.random)).speed;
 		}
-		if(player.get(id).arrowDown[3]){
-			player.get(id).xpos=player.get(id).xpos-player.get(id).speed;
-			player.get(id).turned = -1;
+		if(player.get(getId(Zincgull.random)).arrowDown[3]){
+			player.get(getId(Zincgull.random)).xpos=player.get(getId(Zincgull.random)).xpos-player.get(getId(Zincgull.random)).speed;
+			player.get(getId(Zincgull.random)).turned = -1;
 		}
 		
 	}
 	
 	//possible commands the server can send
 	public boolean specialCommand( String msg ){
+		String[] temp;
+		temp = msg.substring(5).split(":");
 		if( msg.substring(0, 4).equals("/ADD") ){
+			int x = Integer.parseInt(temp[0]);
+			int y = Integer.parseInt(temp[1]);
+			int s = Integer.parseInt(temp[2]);
+			int t = Integer.parseInt(temp[3]);
+			double i = Double.parseDouble(temp[4]);		
+			player.add(new Player(x,y,s,t,i));
 			return true;
 		}else if( msg.substring(0, 4).equals("/SUB") ){
+			double tmp = Double.parseDouble(temp[4]);	
+			player.remove(getId(tmp));
 			return true;
 		}else if( msg.substring(0, 6).equals("/HELLO") ){
 			Chat.chatOutput.append(Zincgull.getTime()+": "+msg.substring(7)+"\n");
