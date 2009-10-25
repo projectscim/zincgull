@@ -19,7 +19,7 @@ public class ChatSrvThread extends Thread {
 			DataInputStream dis = new DataInputStream( socket.getInputStream() );	//gets messages from client
 			while (true) {
 				String message = dis.readUTF();
-				System.out.println( "MSG "+ChatSrv.getTime()+": "+message );
+				//System.out.println( "MSG "+ChatSrv.getTime()+": "+message );	//DEBUG
 				if( !specialCommand(message) ){		//check if it's a special command or not
 					System.out.println( "MSG "+ChatSrv.getTime()+": "+username+": "+message.substring(5) );
 					server.sendToAll( username+": "+message.substring(5) );
@@ -71,7 +71,7 @@ public class ChatSrvThread extends Thread {
 				}
 			}
 		}
-		sendTo( "Not a real command" );	//colorize this!
+		sendTo( "Not a real command, type /help for possible commands" );	//colorize this!
 		return true;
 	}
 }

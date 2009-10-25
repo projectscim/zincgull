@@ -69,11 +69,12 @@ public class Chat extends JPanel implements Runnable {
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
+				chatOutput.append(Zincgull.getTime()+": CHAT: Connected to server\n");
 			} catch( IOException e ) { 
 				//System.out.println( e ); //unnecessary reconnection failed message
 				if(first){
 					//System.out.println( "First time tried failed\n" );	//debug, unnecessary
-					chatOutput.append(Zincgull.getTime()+": Can't connect to chat-server, but trying to reconnect\n");
+					chatOutput.append(Zincgull.getTime()+": CHAT: Can't connect to server, trying again\n");
 					first = false;
 				}
 			}
@@ -91,7 +92,7 @@ public class Chat extends JPanel implements Runnable {
 			}
 		} catch( IOException ie ) { 
 			//System.out.println( ie );	//debug, not necessary with below line
-			chatOutput.append(Zincgull.getTime()+": Connection reset, trying to reconnect\n\n");
+			chatOutput.append(Zincgull.getTime()+": CHAT: Connection reset, reconnecting\n");
 			connectServer(false);
 		}
 	}
