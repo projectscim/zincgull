@@ -55,6 +55,7 @@ public class MapSrvThread extends Thread {
 			}
 
 			MapSrv.positions.add(msg.substring(7));
+			server.sendToAll("/ADD "+msg.substring(7));
 			return true;
 		}
 		return false;

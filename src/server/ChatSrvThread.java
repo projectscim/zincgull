@@ -2,8 +2,6 @@ package server;
 import java.io.*;
 import java.net.*;
 
-import client.Zincgull;
-
 public class ChatSrvThread extends Thread {
 	private ChatSrv server;
 	private Socket socket;
