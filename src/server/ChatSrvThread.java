@@ -18,13 +18,12 @@ public class ChatSrvThread extends Thread {
 		try {
 			DataInputStream dis = new DataInputStream( socket.getInputStream() );	//gets messages from client
 			while (true) {
-			String message = dis.readUTF();
-			System.out.println( "MSG "+ChatSrv.getTime()+": "+message );
-			
-			if( !specialCommand(message) ){		//check if it's a special command or not
-				System.out.println( "MSG "+ChatSrv.getTime()+": "+username+": "+message );
-				server.sendToAll( username+": "+message.substring(5) );
-			}
+				String message = dis.readUTF();
+				System.out.println( "MSG "+ChatSrv.getTime()+": "+message );
+				if( !specialCommand(message) ){		//check if it's a special command or not
+					System.out.println( "MSG "+ChatSrv.getTime()+": "+username+": "+message.substring(5) );
+					server.sendToAll( username+": "+message.substring(5) );
+				}
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
@@ -62,8 +61,9 @@ public class ChatSrvThread extends Thread {
 				}else if( msg.substring(0, 6).equals("/hello") ){	//expecting a hello-message at first connection
 					if( msg.length() > 7 ){
 						username = msg.substring(7);
-						System.out.println( "              username is \""+username+"\"" );
-						server.sendToAll( "-> "+username+" joined, "+ChatSrv.getPeople()+" users online");
+						String send = username+" joined, "+ChatSrv.getPeople()+" users online";
+						System.out.println( "              "+send );
+						server.sendToAll( "-> "+send);
 						return true;
 					}
 					sendTo( "You need a nickname" );	//colorize this!

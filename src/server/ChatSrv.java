@@ -35,9 +35,9 @@ public class ChatSrv {
 			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
 			setPeople(getPeople() + 1);
-			dos.writeUTF("Welcome to the Zincgull chatserver!");
 			getOutputStreams().put( s, dos );		//saving the stream
 			new ChatSrvThread( this, s );		//create a new thread for the stream
+			dos.writeUTF("Welcome to the Zincgull chatserver!");
 		}
 	}
 	// Enumerate all OutputStreams
@@ -60,12 +60,13 @@ public class ChatSrv {
 	
 	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
-			System.out.println( "USR "+getTime()+": Lost connection from "+s );
-			System.out.println("              "+username+" left, "+getPeople()+" left online");
-			getOutputStreams().remove( s );
 			setPeople(getPeople() - 1);	//one less online
+			System.out.println( "USR "+getTime()+": Lost connection from "+s );
+			String send = username+" left, "+getPeople()+" left online";
+			System.out.println("              "+send);
+			getOutputStreams().remove( s );
 			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
-			sendToAll("<- "+username+" left, "+getPeople()+" left online");	//tell everyone that someone left
+			sendToAll("<- "+send);	//tell everyone that someone left
 			try {
 				s.close();
 			} catch( IOException ie ) {
