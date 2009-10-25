@@ -9,16 +9,14 @@ import javax.swing.*;
 public class Chat extends JPanel implements Runnable {
 	private static final long serialVersionUID = -6395460343649750082L;
 	private JTextField chatInput = new JTextField();
-	private TextArea chatOutput = new TextArea();	//not a JTextArea due to bad scroll-support
+	static TextArea chatOutput = new TextArea();	//not a JTextArea due to bad scroll-support
 
 	private Socket socket;		//socket connecting to server
 	private DataOutputStream dos;
 	private DataInputStream dis;
+	private int port = 49050;	//chatserver-port
 	
-	private String host, nickname;
-	private int port = 49050;
-	
-	public Chat(String serverAddress, String nick) {		
+	public Chat() {		
 		chatOutput.setEditable(false);
 		chatOutput.setBackground(Color.BLACK);
 		chatOutput.setForeground(Color.GREEN);
@@ -26,8 +24,6 @@ public class Chat extends JPanel implements Runnable {
 		this.setLayout( new BorderLayout() );
 		this.add( "North", chatInput );
 		this.add( "Center", chatOutput );
-		this.host = serverAddress;
-		this.nickname = nick;
 		
 		// We want to receive messages when someone types a line
 		// and hits return, using an anonymous class as
@@ -65,11 +61,11 @@ public class Chat extends JPanel implements Runnable {
 		boolean reconnect = true;
 		while (reconnect) {
 			try {
-				socket = new Socket(host, port);
+				socket = new Socket(Zincgull.host, port);
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/hello "+nickname );		//say hello to server containing username
+				dos.writeUTF( "/hello "+Zincgull.nick );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -77,7 +73,7 @@ public class Chat extends JPanel implements Runnable {
 				//System.out.println( e ); //unnecessary reconnection failed message
 				if(first){
 					//System.out.println( "First time tried failed\n" );	//debug, unnecessary
-					chatOutput.append(Zincgull.getTime()+": Can't connect to server, but trying to reconnect\n");
+					chatOutput.append(Zincgull.getTime()+": Can't connect to chat-server, but trying to reconnect\n");
 					first = false;
 				}
 			}
