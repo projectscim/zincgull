@@ -35,7 +35,7 @@ public class Chat extends JPanel implements Runnable {
 		chatInput.addActionListener( 
 			new ActionListener() {
 				public void actionPerformed( ActionEvent e ) {
-					if( !e.getActionCommand().equals(null) ){	//make sure it's not null
+					if( !e.getActionCommand().isEmpty() ){	//make sure it's not null
 						processMessage( e.getActionCommand() );
 					}
 				}
@@ -49,7 +49,11 @@ public class Chat extends JPanel implements Runnable {
 	//handles everything that gets typed by the user
 	private void processMessage( String message ) {
 		try {
-			dos.writeUTF( nickname+": "+message );		//send
+			if ( message.substring(0, 1).equals("/") ) {	//only special commands start with a /
+				dos.writeUTF( message );				//send command in full
+			}else{
+				dos.writeUTF( "/msg "+message );		//send as regular message
+			}
 			chatInput.setText( "" );		//clear inputfield
 		} catch( IOException ie ) { 
 			System.out.println( ie ); 
@@ -65,7 +69,7 @@ public class Chat extends JPanel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/nick "+nickname );		//say hello to server containing username
+				dos.writeUTF( "/hello "+nickname );		//say hello to server containing username
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -85,22 +89,23 @@ public class Chat extends JPanel implements Runnable {
 		try {
 			while (true) {
 				String message = dis.readUTF();		//read
-				if( !specialCommand(message) ){
+				//if( !specialCommand(message) ){
 					chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
 					//System.out.println( getTime()+": "+message );	//debug
-				}
+				//}
 			}
 		} catch( IOException ie ) { 
 			//System.out.println( ie );	//debug, not necessary with below line
-			chatOutput.append(Zincgull.getTime()+": Connection reset, trying to reconnect\n");
+			chatOutput.append(Zincgull.getTime()+": Connection reset, trying to reconnect\n\n");
 			connectServer(false);
 		}
 	}
 	
-	//to check if it's a special command
+	//possible commands the server can send
 	public boolean specialCommand( String msg ){
-		if( msg.substring(0, 2).equals("/s")){
-
+		if( msg.substring(0, 6).equals("/users")){
+			return true;
+		}else if( msg.substring(0, 7).equals("/random")){
 			return true;
 		}		
 		return false;

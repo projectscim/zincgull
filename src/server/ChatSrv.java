@@ -74,10 +74,6 @@ public class ChatSrv {
 		}
 	}
 	
-	public void listClients(){
-		
-	}
-	
 	public static String getTime(){
 		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		Date date = new GregorianCalendar().getTime();
