@@ -69,7 +69,7 @@ public class Chat extends JPanel implements Runnable {
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
-				chatOutput.append(Zincgull.getTime()+": CHAT: Connected to server\n");
+				if(!first) chatOutput.append(Zincgull.getTime()+": CHAT: Connected to server\n");
 			} catch( IOException e ) { 
 				//System.out.println( e ); //unnecessary reconnection failed message
 				if(first){
@@ -105,6 +105,7 @@ public class Chat extends JPanel implements Runnable {
 					return false;
 				}else if( msg.substring(0, 6).equals("/nick ") ){	//expecting a hello-message at first connection
 					Zincgull.nick = msg.substring(6);
+					Sidebar.lblNick = new JLabel(Zincgull.nick);
 					return true;
 				}
 			}
