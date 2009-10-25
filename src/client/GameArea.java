@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+//import java.util.LinkedList;
 
 import javax.swing.*;
 
@@ -15,8 +16,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
 	
+//	protected static LinkedList<Player> player = new LinkedList<Player>();
 	URL url = getClass().getResource("../images/zincgull.png");
 	private ImageIcon sprite = new ImageIcon(url);
+	
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
 	private int xpos = 80;
@@ -25,6 +28,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private boolean[] arrowDown = new boolean[4];
 	
 	public GameArea() {
+//		player.add(new Player());
+		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
       	this.setDoubleBuffered(true);
@@ -35,7 +40,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
+		g.drawImage(/*player.*/sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
 		}
@@ -80,7 +85,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/hello "+Zincgull.nick );		//say hello to server containing username
+				dos.writeUTF( "/HELLO "+Zincgull.nick );		//say hello to server containing username
 				// Start a background thread for receiving coordinates
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -136,7 +141,11 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	
 	//possible commands the server can send
 	public boolean specialCommand( String msg ){
-		if( msg.substring(0, 6).equals("/hello") ){
+		if( msg.substring(0, 4).equals("/ADD") ){
+			return true;
+		}else if( msg.substring(0, 4).equals("/SUB") ){
+			return true;
+		}else if( msg.substring(0, 6).equals("/HELLO") ){
 			Chat.chatOutput.append(Zincgull.getTime()+": "+msg.substring(7)+"\n");
 			return true;
 		}

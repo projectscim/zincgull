@@ -27,14 +27,12 @@ public class ChatSrvThread extends Thread {
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
-			// ie.printStackTrace();		//optional failmsg, mostly annoying red text
 		} finally {
 			server.removeConnection( socket, username );	//closing socket when connection is lost
 		}
 	}
 	
 	void sendTo( String message ) {
-		//synchronized( ChatSrv.enumOutputStreams ) {;		//sync so that no other thread screws this one over
 		try {
 			DataOutputStream dos = new DataOutputStream( socket.getOutputStream() );	//get outputstreams
 			dos.writeUTF( message );		//and send message
@@ -58,9 +56,10 @@ public class ChatSrvThread extends Thread {
 				}else if(msg.substring(0, 6).equals("/users") ){
 					sendTo( "Currently there are "+Integer.toString( ChatSrv.getPeople() ) +" users online" );
 					return true;
-				}else if( msg.substring(0, 6).equals("/hello") ){	//expecting a hello-message at first connection
+				}else if( msg.substring(0, 6).equals("/HELLO") ){	//expecting a hello-message at first connection
 					if( msg.length() > 7 ){
 						username = msg.substring(7);
+						sendTo("Welcome to the Zincgull chatserver!");		//welcome-message
 						String send = username+" joined, "+ChatSrv.getPeople()+" users online";
 						System.out.println( "              "+send );
 						server.sendToAll( "-> "+send);

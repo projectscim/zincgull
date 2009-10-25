@@ -37,7 +37,6 @@ public class MapSrv {
 			setPeople(getPeople() + 1);
 			getOutputStreams().put( s, dos );		//saving the stream
 			new MapSrvThread( this, s );		//create a new thread for the stream
-			dos.writeUTF("/hello Welcome to the Zincgull mapserver!");
 		}
 	}
 	// Enumerate all OutputStreams
@@ -65,6 +64,7 @@ public class MapSrv {
 			System.out.println("              "+username+" left, "+getPeople()+" left online");
 			getOutputStreams().remove( s );
 			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
+			sendToAll("/SUB "+username);
 			try {
 				s.close();
 			} catch( IOException ie ) {
