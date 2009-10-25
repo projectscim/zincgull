@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.util.Random;
 //import java.util.LinkedList;
 
 import javax.swing.*;
@@ -20,9 +19,6 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 //	protected static LinkedList<Player> player = new LinkedList<Player>();
 	URL url = getClass().getResource("../images/zincgull.png");
 	private ImageIcon sprite = new ImageIcon(url);
-	
-	private Random randomize = new Random();
-	private double random = randomize.nextDouble();
 	
 	private Timer tim = new Timer(1,this);
 	private int turned = 1;
@@ -58,7 +54,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				if (!specialCommand(coords)) {
 					String[] temp;
 					temp = coords.split(":");
-					if( !temp[5].equals( Double.toString(this.random) ) ){		//only paint new coordinates if they didnt come from this client
+					if( !temp[5].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
 						xpos = Integer.parseInt(temp[0]);
 						ypos = Integer.parseInt(temp[1]);
 						turned = Integer.parseInt(temp[2]);
@@ -75,7 +71,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void sendData() {
 		try {
-			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.nick +":"+ random);
+			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.nick +":"+ Zincgull.random);
 		} catch( IOException ie ) { 
 			//Chat.chatOutput.append( Zincgull.getTime()+": MAP: Can't send coordinates\n" );
 		}

@@ -7,12 +7,16 @@ import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Random;
 
 import javax.swing.JApplet;
 
 public class Zincgull extends JApplet implements MouseListener{
 	private static final long serialVersionUID = 7197415241156375302L;
 	private static boolean mouseActive = false;
+
+	private static Random randomize = new Random();
+	static double random = randomize.nextDouble();
 	
 	static String host, nick;
 	
