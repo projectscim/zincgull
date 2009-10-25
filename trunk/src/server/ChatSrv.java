@@ -37,7 +37,6 @@ public class ChatSrv {
 			setPeople(getPeople() + 1);
 			getOutputStreams().put( s, dos );		//saving the stream
 			new ChatSrvThread( this, s );		//create a new thread for the stream
-			dos.writeUTF("Welcome to the Zincgull chatserver!");
 		}
 	}
 	// Enumerate all OutputStreams
