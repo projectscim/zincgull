@@ -44,7 +44,7 @@ public class MapSrvThread extends Thread {
 	
 	public boolean specialCommand( String msg ){
 		if( msg.substring(0, 6).equals("/HELLO") ){
-			sendTo("/HELLO Welcome to the Zincgull chatserver!");		//welcome-message
+			sendTo("/HELLO Welcome to the Zincgull mapserver!");		//welcome-message
 			username = msg.substring(7);
 			System.out.println( "              "+username+" joined, "+ChatSrv.getPeople()+" users online" );
 			server.sendToAll("/ADD "+username);
