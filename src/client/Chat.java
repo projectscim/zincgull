@@ -65,7 +65,7 @@ public class Chat extends JPanel implements Runnable {
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/HELLO "+Zincgull.nick );		//say hello to server containing username
+				dos.writeUTF( "/HELLO "+Zincgull.nick +":"+ Zincgull.random );	//say hello to server, nickname and unique random
 				// Start a background thread for receiving messages
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;

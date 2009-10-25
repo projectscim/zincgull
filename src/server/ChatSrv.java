@@ -9,7 +9,7 @@ public class ChatSrv {
 	private ServerSocket ss;
 	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
-	private static int people = 0;
+	protected static LinkedList<String> nick = new LinkedList<String>();
 	
 	// Constructor and while-accept loop
 	public ChatSrv( int port ) {
@@ -34,7 +34,6 @@ public class ChatSrv {
 			Socket s = ss.accept();		//grab a connection
 			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
-			setPeople(getPeople() + 1);
 			getOutputStreams().put( s, dos );		//saving the stream
 			new ChatSrvThread( this, s );		//create a new thread for the stream
 		}
@@ -57,14 +56,15 @@ public class ChatSrv {
 		}
 	}
 	
-	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
+	void removeConnection( Socket s, int id ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
-			setPeople(getPeople() - 1);	//one less online
+			String user = nick.get(id);
+			nick.remove(id);	//one less online
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
-			String send = username+" left, "+getPeople()+" left online";
+			String send = user +" left, "+nick.size()+" left online";
 			System.out.println("              "+send);
-			getOutputStreams().remove( s );
-			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
+			getOutputStreams().remove( id );
+			if(nick.isEmpty()) System.out.println( "INF "+getTime()+": No users online" );
 			sendToAll("<- "+send);	//tell everyone that someone left
 			try {
 				s.close();
@@ -81,13 +81,13 @@ public class ChatSrv {
 		return time.format(date);
 	}
 
-	public void setPeople(int people) {
-		ChatSrv.people = people;
-	}
-
-	public static int getPeople() {
-		return people;
-	}
+//	public void setPeople(int people) {
+//		ChatSrv.people = people;
+//	}
+//
+//	public static int getPeople() {
+//		return people;
+//	}
 
 	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
 		this.outputStreams = outputStreams;
