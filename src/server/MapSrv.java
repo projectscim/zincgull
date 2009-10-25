@@ -37,6 +37,7 @@ public class MapSrv {
 			setPeople(getPeople() + 1);
 			getOutputStreams().put( s, dos );		//saving the stream
 			new MapSrvThread( this, s );		//create a new thread for the stream
+			dos.writeUTF("/hello Welcome to the Zincgull mapserver!");
 		}
 	}
 	// Enumerate all OutputStreams
@@ -59,11 +60,11 @@ public class MapSrv {
 	
 	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
-			System.out.println( "USR "+getTime()+": Lost connection from "+s );
-			getOutputStreams().remove( s );
 			setPeople(getPeople() - 1);	//one less online
+			System.out.println( "USR "+getTime()+": Lost connection from "+s );
+			System.out.println("              "+username+" left, "+getPeople()+" left online");
+			getOutputStreams().remove( s );
 			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
-			//sendToAll("<- "+username+" left, "+getPeople()+" left online");	//tell everyone that someone left
 			try {
 				s.close();
 			} catch( IOException ie ) {
