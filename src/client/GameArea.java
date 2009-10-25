@@ -33,7 +33,9 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		for (int i = 0; i < player.size(); i++) {
-			g.drawImage(player.get(i).sprite.getImage(), player.get(i).xpos-player.get(i).turned*28, player.get(i).ypos, player.get(i).turned*76, 56, null);
+			if(player.get(i).id != 0.0){
+				g.drawImage(player.get(i).sprite.getImage(), player.get(i).xpos-player.get(i).turned*28, player.get(i).ypos, player.get(i).turned*76, 56, null);
+			}
 		}
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
@@ -153,9 +155,12 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			int t = Integer.parseInt(temp[3]);
 			double i = Double.parseDouble(temp[4]);		
 			player.add(new Player(x,y,s,t,i));
+			repaint();
 			return true;
 		}else if( msg.substring(0, 4).equals("/SUB") ){
-			player.remove(getId( Double.parseDouble(temp[4]) ));
+			//player.remove(getId( Double.parseDouble(temp[4]) ));
+			player.set(getId(Double.parseDouble(msg.substring(5))), new Player(0,0,0,0,0.0));
+			repaint();
 			return true;
 		}else if( msg.substring(0, 6).equals("/HELLO") ){
 			Chat.chatOutput.append(Zincgull.getTime()+": "+msg.substring(7)+"\n");
