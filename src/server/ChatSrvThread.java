@@ -6,7 +6,7 @@ public class ChatSrvThread extends Thread {
 	private ChatSrv server;
 	private Socket socket;
 	
-	private int id;
+	//private int id;
 	private double random;
 
 	public ChatSrvThread( ChatSrv server, Socket socket ) {
@@ -22,14 +22,14 @@ public class ChatSrvThread extends Thread {
 				String message = dis.readUTF();
 				//System.out.println( "MSG "+ChatSrv.getTime()+": "+message );	//DEBUG
 				if( !specialCommand(message) ){		//check if it's a special command or not
-					System.out.println( "MSG "+ChatSrv.getTime()+": "+ ChatSrv.nick.get(id)+": "+message.substring(5) );
-					server.sendToAll( ChatSrv.nick.get(id)+": "+message.substring(5) );
+					System.out.println( "MSG "+ChatSrv.getTime()+": "+ ChatSrv.getNickname(random)+": "+message.substring(5) );
+					server.sendToAll( ChatSrv.getNickname(random)+": "+message.substring(5) );
 				}
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
 		} finally {
-			server.removeConnection( socket, id );	//closing socket when connection is lost
+			server.removeConnection( socket, random );	//closing socket when connection is lost
 		}
 	}
 	
@@ -48,38 +48,41 @@ public class ChatSrvThread extends Thread {
 				String send = e+" joined, "+ChatSrv.nick.size()+" users online";
 				System.out.println( "              "+send );
 				server.sendToAll( "-> "+send);
-				ChatSrv.nick.add(e);
-				id = ChatSrv.nick.indexOf(e);
+				ChatSrv.nick.add(e+":"+random);
+				//id = ChatSrv.nick.indexOf(e);
 			}else{
 				boolean unique = true;
 				for (int i = 0; i < ChatSrv.nick.size(); i++) {
-					if( ChatSrv.nick.get(i).equals( e ) ){	//needs to be unique
+					String[] tmp;
+					tmp = ChatSrv.nick.get(i).split(":");
+					if( tmp[0].equals( e ) ){	//needs to be unique
 						unique = false;
 					}
 				}
 				if( unique ){
 					if( a ){	//its the /HELLO-command
-						ChatSrv.nick.add(e);
-						id = ChatSrv.nick.indexOf(e);
+						ChatSrv.nick.add(e+":"+random);
+						//id = ChatSrv.nick.indexOf(e);
 						String send = e+" joined, "+ChatSrv.nick.size()+" users online";
 						System.out.println( "              "+send );
 						server.sendToAll( "-> "+send);
 					}else{		//its the /nick-command
-						System.out.println( "USR "+ChatSrv.getTime()+": "+ChatSrv.nick.get(id)+" -> "+e );
-						server.sendToAll( ChatSrv.nick.get(id)+" became "+e );
-						ChatSrv.nick.set(id, e);
+						System.out.println( "USR "+ChatSrv.getTime()+": "+ChatSrv.getNickname(random)+" -> "+e );
+						server.sendToAll( ChatSrv.getNickname(random)+" became "+e );
+						ChatSrv.nick.set(ChatSrv.getId(random), e+":"+random);
 						sendTo("/nick "+e);
 					}
 				}else{
 					if( a ){	//its the /HELLO-command
-						ChatSrv.nick.add(Double.toString(random));
-						id = ChatSrv.nick.indexOf(e);
-						sendTo("Chosen username already exists. Type /nick followed by another username to change.");
-						String send = random+" joined, "+ChatSrv.nick.size()+" users online";
+						int genNick = (int) (random*1000000);
+						ChatSrv.nick.add(genNick+":"+random);
+						//id = ChatSrv.nick.indexOf(e);
+						String send = genNick+" joined, "+ChatSrv.nick.size()+" users online";
 						System.out.println( "              "+send );
 						server.sendToAll( "-> "+send);
+						sendTo("Chosen username already exists. Type /nick followed by another username to change.");
 					}else{		//its the /nick-command
-						System.out.println( "USR "+ChatSrv.getTime()+": "+ChatSrv.nick.get(id)+" failed changing username to "+e );
+						System.out.println( "USR "+ChatSrv.getTime()+": "+ChatSrv.getNickname(random)+" failed changing username to "+e );
 						sendTo("You picked an existing nickname, try again.");
 					}
 				}
@@ -102,7 +105,7 @@ public class ChatSrvThread extends Thread {
 					return true;
 				}else if(msg.substring(0, 6).equals("/users") ){
 					sendTo( "Currently there are "+ ChatSrv.nick.size() +" users online" );
-					System.out.println( "USR "+ChatSrv.getTime()+": "+ ChatSrv.nick.get(id) +" asks how many users are online" );
+					System.out.println( "USR "+ChatSrv.getTime()+": "+ ChatSrv.getNickname(random) +" asks how many users are online" );
 					return true;
 				}else if( msg.substring(0, 6).equals("/HELLO") ){	//expecting a hello-message at first connection
 					if( msg.length() > 7 ){
