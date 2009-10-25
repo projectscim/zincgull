@@ -80,15 +80,14 @@ public class ChatSrv {
 		Date date = new GregorianCalendar().getTime();
 		return time.format(date);
 	}
-
-//	public void setPeople(int people) {
-//		ChatSrv.people = people;
+	
+//	public String getNickname(Double d){
+//		int i = nick.indexOf(String.valueOf(d));
+//		String[] tmp;
+//		tmp = nick.get(i).split(":");
+//		return tmp[0];
 //	}
-//
-//	public static int getPeople() {
-//		return people;
-//	}
-
+	
 	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
 		this.outputStreams = outputStreams;
 	}
