@@ -63,6 +63,7 @@ public class MapSrv {
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
 			getOutputStreams().remove( s );
 			sendToAll("/SUB "+d);
+			if(positions.isEmpty()) System.out.println( "USR "+getTime()+": No users online" );
 			try {
 				s.close();
 			} catch( IOException ie ) {

@@ -16,12 +16,11 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
 	private Timer tim = new Timer(10,this);
+	private boolean connected = false;
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	
-	public GameArea() {
-		//player.add(new Player(Zincgull.random));
-		
+	public GameArea() {		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
       	this.setDoubleBuffered(true);
@@ -119,10 +118,12 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	public void keyTyped(KeyEvent e) {}
 
 	public void actionPerformed(ActionEvent e) {
-		if (Zincgull.isMouseActive()&&(player.get(getId(Zincgull.random)).arrowDown[0]||player.get(getId(Zincgull.random)).arrowDown[1]||player.get(getId(Zincgull.random)).arrowDown[2]||player.get(getId(Zincgull.random)).arrowDown[3])) {
-			sendData();
-			calculateMove();
-			repaint();	
+		if (connected) {
+			if (Zincgull.isMouseActive()&&(player.get(getId(Zincgull.random)).arrowDown[0]||player.get(getId(Zincgull.random)).arrowDown[1]||player.get(getId(Zincgull.random)).arrowDown[2]||player.get(getId(Zincgull.random)).arrowDown[3])) {
+				sendData();
+				calculateMove();
+				repaint();	
+			}
 		}
 	}
 
@@ -155,6 +156,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			int t = Integer.parseInt(temp[3]);
 			double i = Double.parseDouble(temp[4]);		
 			player.add(new Player(x,y,s,t,i));
+			connected = true;
 			repaint();
 			return true;
 		}else if( msg.substring(0, 4).equals("/SUB") ){
