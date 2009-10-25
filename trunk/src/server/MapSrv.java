@@ -9,7 +9,7 @@ public class MapSrv {
 	private ServerSocket ss;
 	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
-	private static int people = 0;
+	protected static LinkedList<String> positions = new LinkedList<String>();
 	
 	// Constructor and while-accept loop
 	public MapSrv( int port ) {
@@ -35,7 +35,6 @@ public class MapSrv {
 			Socket s = ss.accept();		//grab a connection
 			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
 			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
-			setPeople(getPeople() + 1);
 			getOutputStreams().put( s, dos );		//saving the stream
 			new MapSrvThread( this, s );		//create a new thread for the stream
 		}
@@ -44,7 +43,7 @@ public class MapSrv {
 	Enumeration<DataOutputStream> enumOutputStreams() {
 		return getOutputStreams().elements();
 	}
-
+	
 	void sendToAll( String message ) {
 		synchronized( getOutputStreams() ) {		//sync so that no other thread screws this one over
 			for (Enumeration<?> e = enumOutputStreams(); e.hasMoreElements(); ) {
@@ -58,14 +57,12 @@ public class MapSrv {
 		}
 	}
 	
-	void removeConnection( Socket s, String username ) {		//run when connection is discovered dead
+	void removeConnection( Socket s, double d ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
-			setPeople(getPeople() - 1);	//one less online
+			positions.remove(getId(d));
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
-			System.out.println("              "+username+" left, "+getPeople()+" left online");
 			getOutputStreams().remove( s );
-			if(getPeople() == 0) System.out.println( "INF "+getTime()+": No users online" );
-			sendToAll("/SUB "+username);
+			sendToAll("/SUB "+d);
 			try {
 				s.close();
 			} catch( IOException ie ) {
@@ -75,18 +72,21 @@ public class MapSrv {
 		}
 	}
 	
+	public static int getId(Double d){
+		String[] tmp;
+		for (int i = 0; i < positions.size(); i++) {
+			tmp = positions.get(i).split(":");
+			if( tmp[4].equals( Double.toString(d) ) ){	//needs to be unique
+				return i;
+			}
+		}
+		return 0;
+	}
+	
 	public static String getTime(){
 		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		Date date = new GregorianCalendar().getTime();
 		return time.format(date);
-	}
-
-	public void setPeople(int people) {
-		MapSrv.people = people;
-	}
-
-	public static int getPeople() {
-		return people;
 	}
 
 	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {

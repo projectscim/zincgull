@@ -5,7 +5,7 @@ import java.net.*;
 public class MapSrvThread extends Thread {
 	private MapSrv server;
 	private Socket socket;
-	private String username;
+	private Double user;
 
 	public MapSrvThread( MapSrv server, Socket socket ) {
 		this.server = server;
@@ -19,17 +19,18 @@ public class MapSrvThread extends Thread {
 			while (true) {
 				String coords = dis.readUTF();
 				if (!specialCommand(coords)) {
-					server.sendToAll( coords );
 					String[] temp;
 					temp = coords.split(":");
-					username = temp[4];
+					user = Double.parseDouble(temp[4]);
+					MapSrv.positions.set(MapSrv.getId(user), coords);
+					server.sendToAll( coords );
 					System.out.println( "MAP "+MapSrv.getTime()+": COORDS: "+coords );
 				}
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
 		} finally {
-			server.removeConnection( socket, username );	//closing socket when connection is lost
+			server.removeConnection( socket, user );	//closing socket when connection is lost
 		}
 	}
 	
@@ -44,10 +45,16 @@ public class MapSrvThread extends Thread {
 	
 	public boolean specialCommand( String msg ){
 		if( msg.substring(0, 6).equals("/HELLO") ){
+			String[] temp;
+			temp = msg.substring(7).split(":");
+			user = Double.parseDouble(temp[4]);
 			sendTo("/HELLO Welcome to the Zincgull mapserver!");		//welcome-message
-			username = msg.substring(7);
-			System.out.println( "              "+username+" joined, "+MapSrv.getPeople()+" users online" );
-			server.sendToAll("/ADD "+username);
+			
+			for (int i = 0; i < MapSrv.positions.size(); i++) {
+				sendTo("/ADD "+MapSrv.positions.get(i));
+			}
+
+			MapSrv.positions.add(msg.substring(7));
 			return true;
 		}
 		return false;

@@ -125,12 +125,13 @@ public class ChatSrvThread extends Thread {
 					return true;
 				}
 			}else if( msg.length() == 5 && msg.equals("/help") ){
-				String a = Zincgull.getTime()+": Possible commands:\n";
+				String a = "Possible commands:\n";
 				String b = "\t  /users \n";
 				String c = "\t  /nick \n";
 				String d = "\t  /help \n";
 				String e = "\t  /info \n";
 				sendTo(a+b+c+d+e);
+				return true;
 			}
 		}
 		sendTo( "Not a real command, type /help for possible commands" );	//colorize this!
