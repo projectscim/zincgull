@@ -46,7 +46,14 @@ public class Chat extends JPanel implements Runnable {
 	private void processMessage( String message ) {
 		try {
 			if ( message.substring(0, 1).equals("/") ) {	//only special commands start with a /
-				dos.writeUTF( message );				//send command in full
+				if( message.length() == 5 && message.equals("/info") ){
+					chatOutput.append(Zincgull.getTime()+": Client-information:\n");
+					chatOutput.append("\t  Server is "+Zincgull.host+"\n");
+					chatOutput.append("\t  Nickname is "+Zincgull.nick+"\n");
+					chatOutput.append("\t  Unique ID is "+Zincgull.random+"\n");
+				}else{
+					dos.writeUTF( message );				//send command in full
+				}
 			}else{
 				dos.writeUTF( "/msg "+message );		//send as regular message
 			}

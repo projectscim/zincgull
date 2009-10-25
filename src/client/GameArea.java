@@ -54,7 +54,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				if (!specialCommand(coords)) {
 					String[] temp;
 					temp = coords.split(":");
-					if( !temp[5].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
+					if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
 						xpos = Integer.parseInt(temp[0]);
 						ypos = Integer.parseInt(temp[1]);
 						turned = Integer.parseInt(temp[2]);
@@ -71,7 +71,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void sendData() {
 		try {
-			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.nick +":"+ Zincgull.random);
+			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.random);
 		} catch( IOException ie ) { 
 			//Chat.chatOutput.append( Zincgull.getTime()+": MAP: Can't send coordinates\n" );
 		}
@@ -85,7 +85,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/HELLO "+Zincgull.nick );		//say hello to server containing username
+				dos.writeUTF( "/HELLO "+Zincgull.random );		//say hello to server containing username
 				// Start a background thread for receiving coordinates
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
