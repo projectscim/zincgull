@@ -56,14 +56,14 @@ public class ChatSrv {
 		}
 	}
 	
-	void removeConnection( Socket s, int id ) {		//run when connection is discovered dead
+	void removeConnection( Socket s, double d ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
-			String user = nick.get(id);
-			nick.remove(id);	//one less online
+			String user = getNickname(d);
+			nick.remove(getId(d));	//one less online
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
 			String send = user +" left, "+nick.size()+" left online";
 			System.out.println("              "+send);
-			getOutputStreams().remove( id );
+			getOutputStreams().remove( s );
 			if(nick.isEmpty()) System.out.println( "INF "+getTime()+": No users online" );
 			sendToAll("<- "+send);	//tell everyone that someone left
 			try {
@@ -81,12 +81,27 @@ public class ChatSrv {
 		return time.format(date);
 	}
 	
-//	public String getNickname(Double d){
-//		int i = nick.indexOf(String.valueOf(d));
-//		String[] tmp;
-//		tmp = nick.get(i).split(":");
-//		return tmp[0];
-//	}
+	public static String getNickname(Double d){
+		String[] tmp;
+		for (int i = 0; i < nick.size(); i++) {
+			tmp = nick.get(i).split(":");
+			if( tmp[1].equals( Double.toString(d) ) ){	//needs to be unique
+				return tmp[0];
+			}
+		}
+		return "";
+	}
+	
+	public static int getId(Double d){
+		String[] tmp;
+		for (int i = 0; i < nick.size(); i++) {
+			tmp = nick.get(i).split(":");
+			if( tmp[1].equals( Double.toString(d) ) ){	//needs to be unique
+				return i;
+			}
+		}
+		return 0;
+	}
 	
 	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
 		this.outputStreams = outputStreams;
