@@ -20,7 +20,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	
 	public GameArea() {
-		player.add(new Player(Zincgull.random));
+		//player.add(new Player(Zincgull.random));
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
@@ -79,8 +79,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				//dos.writeUTF( "/HELLO "+Zincgull.random );		//say hello to server containing username
-				dos.writeUTF( "/HELLO "+player.get(getId(Zincgull.random)).xpos +":"+ player.get(getId(Zincgull.random)).ypos +":"+ player.get(getId(Zincgull.random)).turned +":"+ player.get(getId(Zincgull.random)).speed +":"+ Zincgull.random);
+				dos.writeUTF("/HELLO 80:50:1:1:"+Zincgull.random);
 				// Start a background thread for receiving coordinates
 				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
@@ -93,15 +92,6 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				}
 			}
 		}
-	}
-	
-	public static Player getPlayer(Double d){
-		for (int i = 0; i < player.size(); i++) {
-			if( player.get(i).id == d ){	//needs to be unique
-				return player.get(i);
-			}
-		}
-		return player.get(getId(Zincgull.random));
 	}
 	
 	public static int getId(Double d){
@@ -165,8 +155,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			player.add(new Player(x,y,s,t,i));
 			return true;
 		}else if( msg.substring(0, 4).equals("/SUB") ){
-			double tmp = Double.parseDouble(temp[4]);	
-			player.remove(getId(tmp));
+			player.remove(getId( Double.parseDouble(temp[4]) ));
 			return true;
 		}else if( msg.substring(0, 6).equals("/HELLO") ){
 			Chat.chatOutput.append(Zincgull.getTime()+": "+msg.substring(7)+"\n");
