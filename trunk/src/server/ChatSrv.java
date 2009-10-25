@@ -18,6 +18,7 @@ public class ChatSrv {
 		} catch (IOException e) {
 			System.out.println( "ERR "+getTime()+": Something failed");
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	

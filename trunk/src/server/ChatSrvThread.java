@@ -2,6 +2,8 @@ package server;
 import java.io.*;
 import java.net.*;
 
+import client.Zincgull;
+
 public class ChatSrvThread extends Thread {
 	private ChatSrv server;
 	private Socket socket;
@@ -77,10 +79,12 @@ public class ChatSrvThread extends Thread {
 						int genNick = (int) (random*1000000);
 						ChatSrv.nick.add(genNick+":"+random);
 						//id = ChatSrv.nick.indexOf(e);
-						String send = genNick+" joined, "+ChatSrv.nick.size()+" users online";
-						System.out.println( "              "+send );
-						server.sendToAll( "-> "+send);
+						String send1 = random+" failed to connect as "+e;
+						String send2 = genNick+" joined, "+ChatSrv.nick.size()+" users online";
+						System.out.println( "              "+send1+"\n              "+send2 );
+						server.sendToAll( "-> "+send2);
 						sendTo("Chosen username already exists. Type /nick followed by another username to change.");
+						sendTo("/nick "+genNick);		//inform client of its new nickname
 					}else{		//its the /nick-command
 						System.out.println( "USR "+ChatSrv.getTime()+": "+ChatSrv.getNickname(random)+" failed changing username to "+e );
 						sendTo("You picked an existing nickname, try again.");
@@ -120,6 +124,13 @@ public class ChatSrvThread extends Thread {
 					sendTo( "You need a nickname" );	//colorize this!
 					return true;
 				}
+			}else if( msg.length() == 5 && msg.equals("/help") ){
+				String a = Zincgull.getTime()+": Possible commands:\n";
+				String b = "\t  /users \n";
+				String c = "\t  /nick \n";
+				String d = "\t  /help \n";
+				String e = "\t  /info \n";
+				sendTo(a+b+c+d+e);
 			}
 		}
 		sendTo( "Not a real command, type /help for possible commands" );	//colorize this!
