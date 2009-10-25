@@ -85,10 +85,9 @@ public class Chat extends JPanel implements Runnable {
 		try {
 			while (true) {
 				String message = dis.readUTF();		//read
-				//if( !specialCommand(message) ){
+				if( !specialCommand(message) ){
 					chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
-					//System.out.println( getTime()+": "+message );	//debug
-				//}
+				}
 			}
 		} catch( IOException ie ) { 
 			//System.out.println( ie );	//debug, not necessary with below line
@@ -99,12 +98,17 @@ public class Chat extends JPanel implements Runnable {
 	
 	//possible commands the server can send
 	public boolean specialCommand( String msg ){
-		if( msg.substring(0, 6).equals("/users")){
-			return true;
-		}else if( msg.substring(0, 7).equals("/random")){
-			return true;
-		}		
-		return false;
+		if( msg.substring(0, 1).equals("/") ){
+			if( msg.length() >= 6){
+				if( msg.substring(0, 5).equals("/msg ") ){
+					return false;
+				}else if( msg.substring(0, 6).equals("/nick ") ){	//expecting a hello-message at first connection
+					Zincgull.nick = msg.substring(6);
+					return true;
+				}
+			}
+		}
+		return true;
 	}
 	
 }

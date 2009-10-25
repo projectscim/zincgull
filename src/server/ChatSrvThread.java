@@ -54,6 +54,7 @@ public class ChatSrvThread extends Thread {
 					System.out.println( "USR "+ChatSrv.getTime()+": "+username+" -> "+tmp );
 					server.sendToAll( username+" became "+tmp );
 					username = tmp;
+					sendTo("/nick "+username);
 					return true;
 				}else if(msg.substring(0, 6).equals("/users") ){
 					sendTo( "Currently there are "+Integer.toString( ChatSrv.getPeople() ) +" users online" );

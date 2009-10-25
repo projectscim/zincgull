@@ -30,11 +30,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
       	this.setDoubleBuffered(true);
       	tim.addActionListener(this);
 		tim.start();
-		try{
-			connectServer(true);	//try to connect, "true" because its the first time
-		}catch (Exception e) {
-			System.out.println(e);
-		}
+		connectServer(true);	//try to connect, "true" because its the first time
 	}
 
 	public void paintComponent(Graphics g) {
@@ -49,11 +45,18 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	public void run() {
 		try {
 			while (true) {
-				String message = dis.readUTF();	
-				Chat.chatOutput.append( Zincgull.getTime()+": "+message+"\n" );	//print
+				String coords = dis.readUTF();
+				String[] temp;
+				temp = coords.split(":");
+				if( Zincgull.nick != temp[4] ){
+					xpos = Integer.parseInt(temp[0]);
+					ypos = Integer.parseInt(temp[1]);
+					turned = Integer.parseInt(temp[2]);
+					speed = Integer.parseInt(temp[3]);
+					repaint();
+				}
 			}
-		} catch( IOException ie ) { 
-			System.out.println( ie );	//debug, not necessary with below line
+		} catch( IOException ie ) {
 			Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connection reset, trying to reconnect\n\n");
 			connectServer(false);
 		}
@@ -61,9 +64,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void sendData() {
 		try {
-			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed );
+			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.nick);
 		} catch( IOException ie ) { 
-			System.out.println( ie ); 
 			Chat.chatOutput.append( Zincgull.getTime()+": MAP: Can't send coordinates\n" );
 		}
 	}
@@ -76,13 +78,13 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				//create streams for communication
 				dis = new DataInputStream( socket.getInputStream() );
 				dos = new DataOutputStream( socket.getOutputStream() );
-				dos.writeUTF( "/hello "+Zincgull.nick );		//say hello to server containing username
-				// Start a background thread for receiving messages
-				//new Thread( this ).start();		//starts run()-method
+				//dos.writeUTF( "/hello "+Zincgull.nick );		//say hello to server
+				// Start a background thread for receiving coordinates
+				new Thread( this ).start();		//starts run()-method
 				reconnect = false;
 			} catch( IOException e ) { 
+				System.out.println(e);
 				if(first){
-					System.out.println(e);
 					Chat.chatOutput.append(Zincgull.getTime()+": MAP: Can't connect to map-server, but trying to reconnect\n");
 					first = false;
 				}
@@ -104,11 +106,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	public void actionPerformed(ActionEvent e) {
 		if(Zincgull.isMouseActive()){
-			try{
-				sendData();
-			}catch (Exception ea) {
-				System.out.println(ea);
-			}
+			sendData();
 			calculateMove();
 			repaint();	
 		}
