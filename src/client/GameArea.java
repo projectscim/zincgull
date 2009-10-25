@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-//import java.util.LinkedList;
+import java.util.LinkedList;
 
 import javax.swing.*;
 
@@ -15,20 +15,16 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private DataOutputStream dos;
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
+	private Timer tim = new Timer(10,this);
 	
-//	protected static LinkedList<Player> player = new LinkedList<Player>();
-	URL url = getClass().getResource("../images/zincgull.png");
-	private ImageIcon sprite = new ImageIcon(url);
-	
-	private Timer tim = new Timer(1,this);
-	private int turned = 1;
-	private int xpos = 80;
-	private int ypos = 50;
-	private int speed = 1;
-	private boolean[] arrowDown = new boolean[4];
+//	private int id = (int) (Zincgull.random*1000000);
+	private int id = 1;
+	protected static LinkedList<Player> player = new LinkedList<Player>();
 	
 	public GameArea() {
-//		player.add(new Player());
+
+		player.add(0, new Player());
+		player.add(id, new Player());
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
@@ -40,7 +36,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(/*player.*/sprite.getImage(), xpos-turned*28, ypos, turned*76, 56, null);
+		g.drawImage(player.get(id).sprite.getImage(), player.get(id).xpos-player.get(id).turned*28, player.get(id).ypos, player.get(id).turned*76, 56, null);
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
 		}
@@ -55,10 +51,12 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 					String[] temp;
 					temp = coords.split(":");
 					if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
-						xpos = Integer.parseInt(temp[0]);
-						ypos = Integer.parseInt(temp[1]);
-						turned = Integer.parseInt(temp[2]);
-						speed = Integer.parseInt(temp[3]);
+						//int tmp = Integer.parseInt(temp[4])*100000;
+						int tmp = 1;
+						player.get(tmp).xpos = Integer.parseInt(temp[0]);
+						player.get(tmp).ypos = Integer.parseInt(temp[1]);
+						player.get(tmp).turned = Integer.parseInt(temp[2]);
+						player.get(tmp).speed = Integer.parseInt(temp[3]);
 						repaint();
 					}
 				}
@@ -71,7 +69,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void sendData() {
 		try {
-			dos.writeUTF( xpos +":"+ ypos +":"+ turned +":"+ speed +":"+ Zincgull.random);
+			dos.writeUTF( player.get(id).xpos +":"+ player.get(id).ypos +":"+ player.get(id).turned +":"+ player.get(id).speed +":"+ Zincgull.random);
 		} catch( IOException ie ) { 
 			//Chat.chatOutput.append( Zincgull.getTime()+": MAP: Can't send coordinates\n" );
 		}
@@ -102,19 +100,19 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40){
-			arrowDown[40-e.getKeyCode()]=true;
+			player.get(id).arrowDown[40-e.getKeyCode()]=true;
 		}
 	}
 	
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40)
-			arrowDown[40-e.getKeyCode()]=false;
+			player.get(id).arrowDown[40-e.getKeyCode()]=false;
 	}
 
 	public void keyTyped(KeyEvent e) {}
 
 	public void actionPerformed(ActionEvent e) {
-		if (Zincgull.isMouseActive()&&(arrowDown[0]||arrowDown[1]||arrowDown[2]||arrowDown[3])) {
+		if (Zincgull.isMouseActive()&&(player.get(id).arrowDown[0]||player.get(id).arrowDown[1]||player.get(id).arrowDown[2]||player.get(id).arrowDown[3])) {
 			sendData();
 			calculateMove();
 			repaint();	
@@ -122,19 +120,19 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	}
 
 	private void calculateMove() {
-		if(arrowDown[0]){
-			ypos=ypos+speed;
+		if(player.get(id).arrowDown[0]){
+			player.get(id).ypos=player.get(id).ypos+player.get(id).speed;
 		}
-		if(arrowDown[1]){
-			xpos=xpos+speed;
-			turned = 1;
+		if(player.get(id).arrowDown[1]){
+			player.get(id).xpos=player.get(id).xpos+player.get(id).speed;
+			player.get(id).turned = 1;
 		}
-		if(arrowDown[2]){
-			ypos=ypos-speed;
+		if(player.get(id).arrowDown[2]){
+			player.get(id).ypos=player.get(id).ypos-player.get(id).speed;
 		}
-		if(arrowDown[3]){
-			xpos=xpos-speed;
-			turned = -1;
+		if(player.get(id).arrowDown[3]){
+			player.get(id).xpos=player.get(id).xpos-player.get(id).speed;
+			player.get(id).turned = -1;
 		}
 		
 	}
