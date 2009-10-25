@@ -108,7 +108,7 @@ public class Chat extends JPanel implements Runnable {
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 	
 }
