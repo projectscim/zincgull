@@ -78,9 +78,7 @@ public class Chat extends JPanel implements Runnable {
 				reconnect = false;
 				if(!first) chatOutput.append(Zincgull.getTime()+": CHAT: Connected to server\n");
 			} catch( IOException e ) { 
-				//System.out.println( e ); //unnecessary reconnection failed message
 				if(first){
-					//System.out.println( "First time tried failed\n" );	//debug, unnecessary
 					chatOutput.append(Zincgull.getTime()+": CHAT: Can't connect to server, trying again\n");
 					first = false;
 				}
@@ -112,7 +110,7 @@ public class Chat extends JPanel implements Runnable {
 					return false;
 				}else if( msg.substring(0, 6).equals("/nick ") ){	//expecting a hello-message at first connection
 					Zincgull.nick = msg.substring(6);
-					Sidebar.lblNick = new JLabel(Zincgull.nick);
+					Sidebar.lblNick.setText(Zincgull.nick);
 					return true;
 				}
 			}
