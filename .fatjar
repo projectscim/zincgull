@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Mon Oct 26 03:02:22 CET 2009
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=zincgull_fat.jar
+manifest.mergeall=true
+manifest.mainclass=
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=<po|zincgull>~server/;<po|zincgull>~www/;<po|zincgull>~.htaccess;<po|zincgull>~client.Zincgull1256521919686.html;<po|zincgull>~java.policy.applet
+includes=
