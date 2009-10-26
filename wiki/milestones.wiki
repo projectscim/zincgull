@@ -15,7 +15,7 @@ Two clients can connect to the server and chat with each other. ~~Although they 
   * ~~Available online at a website as an applet.~~ _Done_
   * ~~Possible for two clients to connect and chat with each other.~~ _Done_
   * ~~Have an animated player-controlled character.~~ _Done_
-  * ~~Get player-positions from the server and paint players.~~ _Webapp is having trouble_
+  * ~~Get player-positions from the server and paint players.~~ _Done_
   * Get map-info from the server and show it with the clients mapdata.
 
 == Schedule ==
