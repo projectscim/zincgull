@@ -2,22 +2,24 @@
 #labels Featured,Phase-Requirements
 
 = Milestone 1: Larus =
-Two clients can connect to the server and chat with each other. Although they can't see each other on the map yet.
+Two clients can connect to the server and chat with each other. ~~Although they can't see each other on the map yet.~~ _They can see each others characters moving on the map._
 
 == Requirements ==
 === Server ===
-  * ~~Up and running.~~
-  * ~~Handle the ingame-chat.~~
+  * ~~Up and running.~~ _Done_
+  * ~~Handle the ingame-chat.~~ _Done_
+  * ~~Communicate player-positions.~~ _Done_
   * Communicate how the map looks like.
 
 === Client ===
-  * Available online at a website as an applet.
-  * ~~Possible for two clients to connect and chat with each other.~~
-  * ~~Have an animated player-controlled character.~~
+  * ~~Available online at a website as an applet.~~ _Done_
+  * ~~Possible for two clients to connect and chat with each other.~~ _Done_
+  * ~~Have an animated player-controlled character.~~ _Done_
+  * ~~Get player-positions from the server and paint players.~~ _Webapp is having trouble_
   * Get map-info from the server and show it with the clients mapdata.
 
 == Schedule ==
-It should be done before the 15th of November.
+It should be done before the ~~15th~~ _1st_ of November.
 
 ----
 
