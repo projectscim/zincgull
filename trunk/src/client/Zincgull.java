@@ -19,6 +19,7 @@ public class Zincgull extends JApplet implements MouseListener{
 	static double random = randomize.nextDouble();
 	
 	static String host, nick;
+	public static boolean connected = false;
 	
 	//start with parameters "host" and "nick"
 	public void init() {	
