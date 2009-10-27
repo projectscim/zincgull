@@ -13,7 +13,6 @@ public class Player {
 	int speed = 1;
 	int turned = 1;
 	double id;
-	boolean[] arrowDown = new boolean[4];
 	
 	public Player( double i ){
 		this.id = i;

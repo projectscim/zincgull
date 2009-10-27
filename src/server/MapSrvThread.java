@@ -45,8 +45,9 @@ public class MapSrvThread extends Thread {
 	
 	public boolean specialCommand( String msg ){
 		if( msg.substring(0, 6).equals("/HELLO") ){
+			msg = msg.substring(7);
 			String[] temp;
-			temp = msg.substring(7).split(":");
+			temp = msg.split(":");
 			user = Double.parseDouble(temp[4]);
 			sendTo("/HELLO Welcome to the Zincgull mapserver!");		//welcome-message
 			
@@ -54,8 +55,8 @@ public class MapSrvThread extends Thread {
 				sendTo("/ADD "+MapSrv.positions.get(i));
 			}
 
-			MapSrv.positions.add(msg.substring(7));
-			server.sendToAll("/ADD "+msg.substring(7));
+			MapSrv.positions.add(msg);
+			server.sendToAll("/ADD "+msg);
 			return true;
 		}
 		return false;
