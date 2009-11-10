@@ -162,7 +162,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			int s = Integer.parseInt(temp[2]);
 			int t = Integer.parseInt(temp[3]);
 			double i = Double.parseDouble(temp[4]);		
-			player.add(new Player(x,y,s,t,i));
+			player.add(new Player(x,y,t,s,i));
 			Zincgull.connected = true;
 			repaint();
 			return true;
