@@ -25,3 +25,7 @@ It's the senior-year high-school project of three it-students in Sweden.
   * [http://us.blizzard.com/en-us/games/d2/ Diablo]
   * [http://www.runescape.com/ Runescape]
   * [http://www.worldofwarcraft.com/moltencore/ The Molten Core]
+
+= Derivatives=
+
+  * [http://code.google.com/p/pansytadpole/ Pansy Tadpole, a 2D tag-game]
