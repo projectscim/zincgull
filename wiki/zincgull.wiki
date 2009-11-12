@@ -1,4 +1,4 @@
-#summary zincgull wikihome
+#summary This is the main wikipage of the project
 #labels Featured
 
 = Introduction =
