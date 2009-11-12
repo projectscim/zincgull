@@ -1,4 +1,4 @@
-#summary how to make the jar-file necessary for the client
+#summary How to make the jar-file necessary for the client
 #labels Phase-Implementation
 
 = Introduction =
