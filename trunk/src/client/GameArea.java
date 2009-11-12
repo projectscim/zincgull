@@ -130,6 +130,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				calculateMove();
 				sendData();
 				repaint();	
+			}else{
+				for (int i = 0; i < arrowDown.length; i++) {
+					arrowDown[i] = false;
+				}
 			}
 		}
 	}
