@@ -10,7 +10,7 @@ This is how you create a certificate, and then export the .class-files to a sing
 
 {{{
 ...\zincgull>keytool -genkey -keyalg rsa -alias zincgull
-Ange keystore-lösenord:
+Ange keystore-lösenord: asdfgh
 Vad heter du i för- och efternamn?
   [Unknown]:  Zincgull Developers
 Vad heter din avdelning inom organisationen?
@@ -29,7 +29,7 @@ Vilken är den tvåställiga landskoden?
 Ange nyckellösenord för <zincgull>
         (RETURN om det är identiskt med keystore-lösenordet):
 
-...\zincgull>keytool -export -alias zincgull -file src\www\zincgull.crt
+...\zincgull>keytool -export -storepass asdfgh -alias zincgull -file src\www\zincgull.crt
 Ange keystore-lösenord:
 Certifikatet har lagrats i filen <src\www\zincgull.crt>
 
@@ -46,8 +46,7 @@ lägger till: client/Sidebar.class (in = 991) (ut = 615) (37% komprimerat)
 
 ...\zincgull\bin>cd ..\src\www
 
-...\zincgull\src\www>jarsigner Zincgull.jar zincgull
-Enter Passphrase for keystore:
+...\zincgull\src\www>jarsigner -storepass asdfgh Zincgull.jar zincgull
 
 Warning:
 The signer certificate will expire within six months.
