@@ -33,7 +33,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		super.paintComponent(g);
 		for (int i = 0; i < player.size(); i++) {
 			if(player.get(i).id != 0.0){
-				g.drawImage(player.get(i).sprite.getImage(), player.get(i).xpos-player.get(i).turned*28, player.get(i).ypos, player.get(i).turned*76, 56, null);
+				g.drawImage(player.get(i).sprite.getImage(), player.get(i).xpos-player.get(i).turned*(100/2), player.get(i).ypos, player.get(i).turned*100, 50, null);
 			}
 		}
 		if(Zincgull.isMouseActive()){
