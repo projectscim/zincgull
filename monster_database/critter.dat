@@ -1,0 +1,15 @@
+name=Cute Bunny
+health=10
+damage=0
+level=0
+aggro=0
+spawn="plains"
+boss=false
+
+name=Cute Koala
+health=10
+damage=0
+level=0
+aggro=0
+spawn=forest
+boss=false
