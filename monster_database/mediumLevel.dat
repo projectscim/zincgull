@@ -1,0 +1,7 @@
+name=Basilisk
+health=75
+damage=45
+level=12
+aggro=25
+spawn=forest
+boss=false

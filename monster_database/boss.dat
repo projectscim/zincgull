@@ -1,0 +1,7 @@
+name=White Rabbit
+health=150
+damage=200
+level=25
+aggro=20
+spawn=plains
+boss=true

@@ -1,0 +1,7 @@
+name=Rabid Hound
+health=30
+damage=15
+level=5
+aggro=5
+spawn=plains
+boss=false
