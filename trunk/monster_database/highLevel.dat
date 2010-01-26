@@ -1,0 +1,7 @@
+name=Black Knight
+health=300
+damage=50
+level=20
+aggro=15
+spawn=desert
+boss=false

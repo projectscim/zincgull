@@ -20,6 +20,17 @@ public class Monster implements Runnable {
 	public Monster() {
 		
 	}
+	
+	public void printStats() {
+		System.out.println("Name: "+name);
+		System.out.println("Health: "+health);
+		System.out.println("Damage: "+damage);
+		System.out.println("Level: "+level);
+		System.out.println("Aggro: "+aggro);
+		System.out.println("Spawn: "+spawnLocation);
+		System.out.println("Boss: "+boss);
+		System.out.println("--------------");
+	}
 
 	public String getName() {
 		return name;
