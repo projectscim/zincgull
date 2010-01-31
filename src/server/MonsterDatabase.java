@@ -7,6 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,6 +43,7 @@ public class MonsterDatabase {
 	private static DataInputStream dis;
 	private static BufferedReader reader;
 	private static String temp;
+	private static Connection conn = null;
 	
 	//filename of 
 	private static final String md = "monster_database//";
@@ -49,7 +53,7 @@ public class MonsterDatabase {
 	private static final String highLevel = "highLevel.dat";
 	private static final String boss = "boss.dat";
 	
-	public MonsterDatabase() {
+	public MonsterDatabase() throws SQLException {
 		loadCritters();
 		loadLowLevels();
 		loadMediumLevels();
@@ -63,6 +67,35 @@ public class MonsterDatabase {
 			monster.printStats();
 		}
 		
+		connectMySQL();
+		
+		conn.close();
+	}
+	
+	private void connectMySQL() {
+		String host = "localhost";
+		String database = "arxe_java";
+		String url = "jdbc:mysql://"+host+"/"+database;
+		String user = "arxe";
+		String pass = "asdf";
+		
+		conn = null;
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			conn = DriverManager.getConnection(url, user, pass);
+			
+			System.out.println("Connection Successful");
+			
+		} catch (InstantiationException e) {
+			System.out.println("fail1");
+		} catch (IllegalAccessException e) {
+			System.out.println("fail2");
+		} catch (ClassNotFoundException e) {
+			System.out.println("fail3");
+		} catch (SQLException e) {
+			System.out.println("fail4");
+		}
 	}
 	
 	
@@ -84,6 +117,10 @@ public class MonsterDatabase {
 	
 	private static void loadBosses() {
 		loadMonsters(boss);
+	}
+	
+	private void loadMonsters() {
+		
 	}
 	
 	private static int loadMonsters(String databaseName) {
@@ -246,7 +283,7 @@ public class MonsterDatabase {
 		
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		new MonsterDatabase();
 	}
 }
