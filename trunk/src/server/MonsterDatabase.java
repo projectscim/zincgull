@@ -23,10 +23,7 @@ import java.util.Random;
  * @author Andreas
  */
 
- // TODO Fail safe "unable to load monsterlist" to hardcoded default.
  // TODO Possibility to backup monsterlists.
- // TODO To get around the issue with easily corrupted databases: Make Monster Serializable - only allow creation of new monsters through internal methods.
- //       Quicker fix than to write code to make it fail safe. Very much preferable even? since it makes it possible to prevent OPed creatures.
 
 public class MonsterDatabase {
 	
@@ -45,7 +42,14 @@ public class MonsterDatabase {
 	private static String temp;
 	private static Connection conn = null;
 	
-	//filename of 
+	//Database
+	private static final String host = "localhost";
+	private static final String database = "arxe_java";
+	private static final String url = "jdbc:mysql://"+host+"/"+database;
+	private static final String user = "arxe";
+	private static final String pass = "asdf";
+	
+	//Local Backup Database 
 	private static final String md = "monster_database//";
 	private static final String critter = "critter.dat";
 	private static final String lowLevel = "lowLevel.dat";
@@ -54,50 +58,50 @@ public class MonsterDatabase {
 	private static final String boss = "boss.dat";
 	
 	public MonsterDatabase() throws SQLException {
+		
+		connectMySQL();
+		
+		if(conn != null) {
+			
+			
+			conn.close();
+		}
+		else loadAllMonstersFromLocalDB();
+		
+		
+	}
+	
+	private void connectMySQL() {
+		conn = null;
+		System.out.println("Connecting to MySQL-database..");
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			conn = DriverManager.getConnection(url, user, pass);
+			System.out.println("Connection to MySQL-datbase established");
+			
+		} catch (InstantiationException e) {
+			System.out.println("ERROR: InstantiationException");
+		} catch (IllegalAccessException e) {
+			System.out.println("ERROR: IllegalAccessException");
+		} catch (ClassNotFoundException e) {
+			System.out.println("ERROR: ClassNotFoundException");
+		} catch (SQLException e) {
+			System.out.println("ERROR: SQLException");
+		} finally {
+			System.out.println("ERROR: Connection FAILED");
+		}
+	}
+	
+	private static void loadAllMonstersFromLocalDB() {
+		System.out.println("Loading local backup of the MonsterDB.");
 		loadCritters();
 		loadLowLevels();
 		loadMediumLevels();
 		loadHighLevels();
 		loadBosses();
-		
-		System.out.println("Loading Complete!\n");
-		
-		for(int i=0;i<7;i++) {
-			monster = getRandomMonster();
-			monster.printStats();
-		}
-		
-		connectMySQL();
-		
-		conn.close();
+		System.out.println("Loading of Local Backup is Complete!\n");
 	}
-	
-	private void connectMySQL() {
-		String host = "localhost";
-		String database = "arxe_java";
-		String url = "jdbc:mysql://"+host+"/"+database;
-		String user = "arxe";
-		String pass = "asdf";
-		
-		conn = null;
-		
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			conn = DriverManager.getConnection(url, user, pass);
-			
-			System.out.println("Connection Successful");
-			
-		} catch (InstantiationException e) {
-			System.out.println("fail1");
-		} catch (IllegalAccessException e) {
-			System.out.println("fail2");
-		} catch (ClassNotFoundException e) {
-			System.out.println("fail3");
-		} catch (SQLException e) {
-			System.out.println("fail4");
-		}
-	}
-	
 	
 	private static void loadCritters() {
 		loadMonsters(critter);
@@ -119,7 +123,7 @@ public class MonsterDatabase {
 		loadMonsters(boss);
 	}
 	
-	private void loadMonsters() {
+	private static void loadMonsters() {
 		
 	}
 	
