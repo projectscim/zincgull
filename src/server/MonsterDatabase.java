@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,23 +53,32 @@ public class MonsterDatabase {
 	
 	//Local Backup Database 
 	private static final String md = "monster_database//";
-	private static final String critter = "critter.dat";
-	private static final String lowLevel = "lowLevel.dat";
-	private static final String mediumLevel = "mediumLevel.dat";
-	private static final String highLevel = "highLevel.dat";
-	private static final String boss = "boss.dat";
+	private static final String critter = "critter";
+	private static final String lowLevel = "lowLevel";
+	private static final String mediumLevel = "mediumLevel";
+	private static final String highLevel = "highLevel";
+	private static final String boss = "boss";
+	private static final String DBextension = ".dat";
 	
 	public MonsterDatabase() throws SQLException {
 		
 		connectMySQL();
 		
 		if(conn != null) {
-			
-			
+			loadMonsters();
 			conn.close();
 		}
 		else loadAllMonstersFromLocalDB();
 		
+		for(int i = 0;i<5;i++) {
+			monster = getRandomMonster();
+			monster.printStats();
+		}
+		
+		System.out.println("------------\n" +
+				"Monster by name:");
+		monster = getMonsterByName("Rabid Hound");
+		monster.printStats();
 		
 	}
 	
@@ -79,17 +90,47 @@ public class MonsterDatabase {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conn = DriverManager.getConnection(url, user, pass);
 			System.out.println("Connection to MySQL-datbase established");
-			
 		} catch (InstantiationException e) {
-			System.out.println("ERROR: InstantiationException");
+			System.out.println("ERROR: InstantiationException\n" +
+					"ERROR: Connection FAILED");
 		} catch (IllegalAccessException e) {
-			System.out.println("ERROR: IllegalAccessException");
+			System.out.println("ERROR: IllegalAccessException\n" +
+					"ERROR: Connection FAILED");
 		} catch (ClassNotFoundException e) {
-			System.out.println("ERROR: ClassNotFoundException");
+			System.out.println("ERROR: ClassNotFoundException\n" +
+					"ERROR: Connection FAILED");
 		} catch (SQLException e) {
-			System.out.println("ERROR: SQLException");
-		} finally {
-			System.out.println("ERROR: Connection FAILED");
+			System.out.println("ERROR: SQLException\n" +
+					"ERROR: Connection FAILED");
+		}
+	}
+	
+	private static void loadMonsters() throws SQLException {
+		Statement stmt = conn.createStatement();
+		ResultSet rs;
+		int level;
+		
+		rs = stmt.executeQuery("SELECT * FROM Monster ORDER BY level");
+		while(rs.next()) {
+			monster = new Monster();
+			
+			monster.setName(rs.getString("name"));
+			monster.setHealth(rs.getInt("health"));
+			monster.setDamage(rs.getInt("damage"));
+			monster.setLevel(rs.getInt("level"));
+			monster.setAggro(rs.getInt("aggro"));
+			monster.setSpawnLocation(rs.getString("spawnLocation"));
+			monster.setBoss((rs.getInt("boss")==1)?true:false); //tinyint
+			
+			level = monster.getLevel();
+			if(monster.isBoss()) {
+				bossList.add(monster);
+			} else {
+				if(level==0) critterList.add(monster);
+				else if(level<=5) lowLevelList.add(monster);
+				else if(level<=15) mediumLevelList.add(monster);
+				else if(level<=25) highLevelList.add(monster);				
+			}
 		}
 	}
 	
@@ -123,16 +164,10 @@ public class MonsterDatabase {
 		loadMonsters(boss);
 	}
 	
-	private static void loadMonsters() {
-		
-	}
-	
 	private static int loadMonsters(String databaseName) {
 		
-		String type = databaseName.substring(0, databaseName.indexOf('.')); //Gets the filename of the database read in order to give accurate reports.
-		
 		try {
-			fis = new FileInputStream(md + databaseName);
+			fis = new FileInputStream(md + databaseName + DBextension);
 			bis = new BufferedInputStream(fis);
 			dis = new DataInputStream(bis);
 			reader = new BufferedReader(new InputStreamReader(dis));
@@ -149,7 +184,7 @@ public class MonsterDatabase {
 						break;
 					}
 					else if(temp.isEmpty()) {
-						System.out.println("ERROR: "+type+" database may be corrupt");
+						System.out.println("ERROR: "+databaseName+" database may be corrupt");
 						break;
 					}
 					
@@ -198,10 +233,10 @@ public class MonsterDatabase {
 					i++; //Another Monster read
 				}
 				
-				System.out.println("Monsters added to "+type+"List: "+i);
+				System.out.println("Monsters added to "+databaseName+"List: "+i);
 				
 			} catch (IOException e) {
-				System.out.println("FATAL ERROR: Unable to read "+type+" list");
+				System.out.println("FATAL ERROR: Unable to read "+databaseName+" list");
 			}
 				
 			fis.close();
@@ -212,18 +247,104 @@ public class MonsterDatabase {
 			
 		} catch (FileNotFoundException e) {
 			System.out.println(md + databaseName);
-			System.out.println("FATAL ERROR: Unable to Load "+type+" List");
+			System.out.println("FATAL ERROR: Unable to Load "+databaseName+" List");
 			return -1;
 		} catch (IOException e) {
-			System.out.println("FATAL ERROR: Unable to Read "+type+" List");
+			System.out.println("FATAL ERROR: Unable to Read "+databaseName+" List");
 		}
 		
 		return 0;
 	}
 	
+	public static Monster getMonsterByName(String name) {
+		monster = getMonsterByName(name, null);
+		return monster;
+	}
+	
+	public static Monster getMonsterByName(String name, String type) {
+		int i = 0;
+		boolean allLists = false;
+		
+		if(type!=null) {
+			type = type.toLowerCase();
+			if(type!=critter&&type!=lowLevel&&type!=mediumLevel&&type!=highLevel&&type!=boss) {
+				allLists=true;
+			}
+		}
+		else allLists = true;
+		
+		if(type==critter.toLowerCase() || allLists) {
+			int size = critterList.size();
+			i = 0;
+			while(i<size) {
+				if(critterList.get(i).getName().equalsIgnoreCase(name)) {
+					monster = critterList.get(i);
+					System.out.println("Monster found, returning: "+name);
+					return monster;
+				}
+				i++;
+			}
+		}
+		
+		if(type==lowLevel.toLowerCase() || allLists) {
+			int size = lowLevelList.size();
+			i = 0;
+			while(i<size) {
+				if(lowLevelList.get(i).getName().equalsIgnoreCase(name)) {
+					monster = lowLevelList.get(i);
+					System.out.println("Monster found, returning: "+name);
+					return monster;
+				}
+				i++;
+			}
+		}
+		
+		if(type==mediumLevel.toLowerCase() || allLists) {
+			int size = mediumLevelList.size();
+			i = 0;
+			while(i<size) {
+				if(mediumLevelList.get(i).getName().equalsIgnoreCase(name)) {
+					monster = mediumLevelList.get(i);
+					System.out.println("Monster found, returning: "+name);
+					return monster;
+				}
+				i++;
+			}
+		}
+		
+		if(type==highLevel.toLowerCase() || allLists) {
+			int size = highLevelList.size();
+			i = 0;
+			while(i<size) {
+				if(highLevelList.get(i).getName().equalsIgnoreCase(name)) {
+					monster = highLevelList.get(i);
+					System.out.println("Monster found, returning: "+name);
+					return monster;
+				}
+				i++;
+			}
+		}
+		
+		if(type==boss.toLowerCase() || allLists) {
+			int size = bossList.size();
+			i = 0;
+			while(i<size) {
+				if(bossList.get(i).getName().equalsIgnoreCase(name)) {
+					monster = bossList.get(i);
+					System.out.println("Monster found, returning: "+name);
+					return monster;
+				}
+				i++;
+			}
+		}
+		
+		System.out.println("ERROR: getMonsterByName() was unable to find the monster: '"+name+"'");
+		return null;
+	}
+	
 	
 	/**
-	 * TODO returns
+	 * 
 	 * @return
 	 */
 	public static Monster getRandomMonster() {
@@ -255,6 +376,7 @@ public class MonsterDatabase {
 		return  monster;
 	}
 	
+	//TODO Fail Safe empty list.
 	private static void randomMonster(String databaseName) {
 		
 		if(databaseName==critter) {
@@ -281,9 +403,7 @@ public class MonsterDatabase {
 			randomize = new Random();
 			random = randomize.nextInt(bossList.size());
 			monster = bossList.get(random);
-		}	
-	
-		
+		}
 		
 	}
 	
