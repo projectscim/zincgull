@@ -16,11 +16,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * The MonsterDatabase returns Monster objects.
+ * The MonsterDatabase returns Monster objects.<br>
+ * MonsterDatbase loads Monsters from a specified (hardcoded) MySQL-database, if connection to the database fails it tries to load from a local backup instead. 
  * <p>
- * It can return Monster objects with a large variety of methods, each picking monsters based on different requirements.
+ * It can return Monster objects with a variety of methods, each picking monsters based on different requirements:
+ * <ul>
+ * <li>Completely random - getRandomMonster()
+ * <li>Specific monster via name - getMonsterByName(String)
+ * <li>Specific monster based on name & type - getMonsterByName(String, String)
+ * </ul>
+ * Different types of monsters are stored in separated ArrayLists therefore it is somewhat faster to get monsters by name if type is provided.
+ * If the type provided doesn't exist it's treated as null and all ArrayLists are searched.
  * <p>
- * The MonserDatabase is dependent on correctly formated monster-databases, it's not very forgiving.
+ * The backup database (local file), is dependent on correctly formated monster-databases, it's not very forgiving.
  * 
  * @author Andreas
  */
@@ -29,36 +37,39 @@ import java.util.Random;
 
 public class MonsterDatabase {
 	
-	private static Monster monster;
 	private static Random randomize;
 	private static int random;
+	private static FileInputStream fis;
+	private static BufferedInputStream bis;
+	private static DataInputStream dis;
+	private static BufferedReader reader;
+	
+	private static Monster monster;
 	private static ArrayList<Monster> critterList = new ArrayList<Monster>();
 	private static ArrayList<Monster> lowLevelList = new ArrayList<Monster>();
 	private static ArrayList<Monster> mediumLevelList = new ArrayList<Monster>();
 	private static ArrayList<Monster> highLevelList = new ArrayList<Monster>();
 	private static ArrayList<Monster> bossList = new ArrayList<Monster>();
-	private static FileInputStream fis;
-	private static BufferedInputStream bis;
-	private static DataInputStream dis;
-	private static BufferedReader reader;
-	private static String temp;
-	private static Connection conn = null;
 	
-	//Database
+	//MySQL-Database
 	private static final String host = "localhost";
 	private static final String database = "arxe_java";
 	private static final String url = "jdbc:mysql://"+host+"/"+database;
 	private static final String user = "arxe";
 	private static final String pass = "asdf";
+	private static Connection conn = null;
 	
 	//Local Backup Database 
 	private static final String md = "monster_database//";
+	private static final String DBextension = ".dat";
+	
+	//The names of the different monster-types.
+	//Changes affect local backup and monster-fetching.
 	private static final String critter = "critter";
 	private static final String lowLevel = "lowLevel";
 	private static final String mediumLevel = "mediumLevel";
 	private static final String highLevel = "highLevel";
 	private static final String boss = "boss";
-	private static final String DBextension = ".dat";
 	
 	public MonsterDatabase() throws SQLException {
 		
@@ -82,6 +93,11 @@ public class MonsterDatabase {
 		
 	}
 	
+	/**
+	 * Connects to MySQL-database.<br>
+	 * Sets {@link #conn} if successful.<br>
+	 * @see {@link #host}, {@link #user} and {@link #pass}
+	 */
 	private void connectMySQL() {
 		conn = null;
 		System.out.println("Connecting to MySQL-database..");
@@ -105,6 +121,10 @@ public class MonsterDatabase {
 		}
 	}
 	
+	/**
+	 * Load Monster-objects from MySQL-database and stores them in appropriate ArrayList (as determined by the level of the loaded Monster).
+	 * @throws SQLException
+	 */
 	private static void loadMonsters() throws SQLException {
 		Statement stmt = conn.createStatement();
 		ResultSet rs;
@@ -164,7 +184,15 @@ public class MonsterDatabase {
 		loadMonsters(boss);
 	}
 	
+	/**
+	 * Reads Monster-objects from file and stores them in the appropriate ArrayList (as determined by databaseName).<br>
+	 * Very dependent on the file being correctly formated.
+	 * 
+	 * @param databaseName - The name of the file containing the database (without file-extensions).
+	 * @return 0 if database is existent, -1 otherwise.
+	 */
 	private static int loadMonsters(String databaseName) {
+		String temp;
 		
 		try {
 			fis = new FileInputStream(md + databaseName + DBextension);
@@ -256,11 +284,34 @@ public class MonsterDatabase {
 		return 0;
 	}
 	
+	/**
+	 * Searches all ArrayLists for the monster with the provided name.<br>
+	 * Calls getMonsterByName(String,String) with null as the second argument.
+	 * 
+	 * @param name - The name of the Monster which should be returned (not case-sensitive).
+	 * @return A Monster-object.
+	 * @see #getMonsterByName(String, String)
+	 */
 	public static Monster getMonsterByName(String name) {
 		monster = getMonsterByName(name, null);
 		return monster;
 	}
 	
+	/**
+	 * Searches the appropriate ArrayList (as determined by type) for a Monster with the provided name.
+	 * If type is null or not equal to any of the monster-types all ArrayLists will be searched.
+	 * 
+	 * @param name - The name of the Monster which should be returned (not case-sensitive).
+	 * @param type - Null or one of the monster-types:
+	 * <ul>
+	 * <li>{@link #critter}
+	 * <li>{@link #lowLevel}
+	 * <li>{@link #mediumLevel}
+	 * <li>{@link #highLevel}
+	 * <li>{@link #boss}
+	 * </ul>
+	 * @return A Monster-object.
+	 */
 	public static Monster getMonsterByName(String name, String type) {
 		int i = 0;
 		boolean allLists = false;
@@ -344,8 +395,9 @@ public class MonsterDatabase {
 	
 	
 	/**
-	 * 
-	 * @return
+	 * Calls the static randomMonster-method with a randomized argument (one of the 5 monster-types).
+	 * @return A Monster-object.
+	 * @see #randomMonster(String)
 	 */
 	public static Monster getRandomMonster() {
 		 randomize = new Random();
@@ -376,9 +428,45 @@ public class MonsterDatabase {
 		return  monster;
 	}
 	
-	//TODO Fail Safe empty list.
-	private static void randomMonster(String databaseName) {
+	/**
+	 * Calls the randomMonster-method with type as argument.
+	 * @see #randomMonster(String)
+	 * 
+	 * @param type - Compared to the name of the monster-types:
+	 * <ul>
+	 * <li>{@link #critter}
+	 * <li>{@link #lowLevel}
+	 * <li>{@link #mediumLevel}
+	 * <li>{@link #highLevel}
+	 * <li>{@link #boss}
+	 * </ul>
+	 * @return A Monster-object.
+	 */
+	public static Monster getRandomMonster(String type) {
 		
+		if(type==critter) randomMonster(critter);
+		else if(type==lowLevel) randomMonster(lowLevel);
+		else if(type==mediumLevel) randomMonster(mediumLevel);
+		else if(type==highLevel) randomMonster(highLevel);
+		else if(type==boss) randomMonster(boss);
+		else System.out.println("FATAL ERROR: Unable to randomize monster.");
+		
+		return  monster;
+	}
+	
+	/**
+	 * Sets the static Monster-object to a random monster based on type.
+	 * @param databaseName - Compared to the name of the monster-types:
+	 * <ul>
+	 * <li>{@link #critter}
+	 * <li>{@link #lowLevel}
+	 * <li>{@link #mediumLevel}
+	 * <li>{@link #highLevel}
+	 * <li>{@link #boss}
+	 * </ul>
+	 */
+	private static void randomMonster(String databaseName) {
+		//TODO Fail Safe empty list.
 		if(databaseName==critter) {
 			randomize = new Random();
 			random = randomize.nextInt(critterList.size());
@@ -404,9 +492,13 @@ public class MonsterDatabase {
 			random = randomize.nextInt(bossList.size());
 			monster = bossList.get(random);
 		}
-		
+
 	}
 	
+	/**
+	 * Main-method to add the ability to run the MonsterDatbase as a StandAlone operation.
+	 * @throws SQLException
+	 */
 	public static void main(String[] args) throws SQLException {
 		new MonsterDatabase();
 	}
