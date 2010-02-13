@@ -1,13 +1,18 @@
 package server;
 
+import client.Sprite;
+
 /**
  * 
  * 
  * 
  * @author Andreas
  */
-public class Monster implements Runnable {
+public class Monster extends Sprite implements Runnable {
 	
+	Thread thread = new Thread(this);
+	
+	//Stats
 	private String name;
 	private int damage;
 	private int health;
@@ -15,13 +20,19 @@ public class Monster implements Runnable {
 	private int aggro;
 	private String spawnLocation;
 	private boolean boss;
-
+	private int speed = 1;		//TODO add to MonsterDatabase
 	
-	public Monster() {
-		
-	}
+	//Active
+	private int state;
+	private static final int WAITING = 0;
+	private static final int ATTACKING = 1;
+	
+	private boolean alive;
+	
+	public Monster() {}
 	
 	public void printStats() {
+		System.out.println("--MONSTER STATS--");
 		System.out.println("Name: "+name);
 		System.out.println("Health: "+health);
 		System.out.println("Damage: "+damage);
@@ -32,6 +43,30 @@ public class Monster implements Runnable {
 		System.out.println("--------------");
 	}
 
+	public void run() {
+		
+		alive = true;
+		
+		while(alive) {
+			if(state==WAITING) {
+				//Check
+			}
+			else if(state==ATTACKING) {
+				//Check
+				
+				//Move
+				
+				//Attack
+			}			
+		}
+		
+	}
+	
+	
+	
+	
+	//a Shitload of getters/setters
+	
 	public String getName() {
 		return name;
 	}
@@ -86,14 +121,6 @@ public class Monster implements Runnable {
 
 	public void setBoss(boolean boss) {
 		this.boss = boss;
-	}
-
-	public void run() {
-
-		while(true) {
-			//TODO Stuff
-		}
-		
 	}
 	
 }
