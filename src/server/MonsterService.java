@@ -1,18 +1,16 @@
 package server;
 
+import java.sql.SQLException;
 import java.util.Random;
 
 /**
  * (the) MonsterService keeps track of monsters in play and spawn new ones.
  * <p>
  * Monster spawns, spawns new threads of the Monster-class.
- * MonsterService can be run as a stand-alone application but is intended to be used as a part of the Zincgull-server.
  * 
  * @author Andreas
  */
-public class MonsterService implements Runnable {
-	
-	Thread thread = new Thread(this);
+public class MonsterService extends Thread {
 	
 	private static int monsterCount;
 	private static int monstersPlains;
@@ -25,7 +23,7 @@ public class MonsterService implements Runnable {
 	private static int chanceToEndSurge; //one in ..
 	private static long sleep;
 	
-	private static Monster monster;
+	private static Monster monster[] = new Monster[30];
 	private static final boolean active = true; //Monsters spawned are always active/alive, active is used to increase readability.
 	
 	public MonsterService() {
@@ -36,12 +34,8 @@ public class MonsterService implements Runnable {
 		sleep = 5000;
 	}
 	
-	public static void main(String[] args) {
-		new MonsterService();
-	}
-	
 	private static void monsterSurge() {
-		Random randomize = new Random();
+		/*Random randomize = new Random();
 		int random;
 		
 		if(!isSurge) {
@@ -65,34 +59,51 @@ public class MonsterService implements Runnable {
 				isSurge = false;
 				monsterLimit = monsterLimit / 2;
 			}
-		}
+		}*/
 		
 	}
 	
-	private static void spawn() {
+	private synchronized static void spawn() {
+		
+		System.out.println(monsterCount);
+		
+		monster[monsterCount] = MonsterDatabase.getRandomMonster();
+		monster[monsterCount].thread.start();
+		
+		monsterCount++;
 		
 	}
 	
-	public static void setIsSurge(boolean statement) {
+	public synchronized static void dyingMonster(Monster deadMonster) {
+		System.out.println("this monster is dying:");
+		deadMonster.printStats();
+	}
+	
+	public synchronized static void setIsSurge(boolean statement) {
 		if(statement) isSurge = true;
 		else isSurge = false;
 	}
 
-	public void run() {
+	public synchronized void run() {
 		while(true) {
 			//Slight chance of Monster Surge starting
 			//Significant chance of Monster Surge ending
-			monsterSurge();
-		
-			spawn();
+			//monsterSurge();
+			synchronized(new Object()) {
+				spawn();
+				
+				monster[0].printStats();
+			}
 			
-			//Sleep 5s
+			
+			//Sleep
 			try {
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
 				System.out.println("MonsterService Failed to sleep");
 				e.printStackTrace();
 			}
+			
 		}
 		
 	}
