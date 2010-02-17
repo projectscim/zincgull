@@ -80,17 +80,6 @@ public class MonsterDatabase {
 			conn.close();
 		}
 		else loadAllMonstersFromLocalDB();
-		
-		for(int i = 0;i<5;i++) {
-			monster = getRandomMonster();
-			monster.printStats();
-		}
-		
-		System.out.println("------------\n" +
-				"Monster by name:");
-		monster = getMonsterByName("Rabid Hound");
-		monster.printStats();
-		
 	}
 	
 	/**

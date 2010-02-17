@@ -29,9 +29,11 @@ public class Monster extends Sprite implements Runnable {
 	
 	private boolean alive;
 	
-	public Monster() {}
+	public Monster() {
+		
+	}
 	
-	public void printStats() {
+	public synchronized void printStats() {
 		System.out.println("--MONSTER STATS--");
 		System.out.println("Name: "+name);
 		System.out.println("Health: "+health);
@@ -43,11 +45,14 @@ public class Monster extends Sprite implements Runnable {
 		System.out.println("--------------");
 	}
 
-	public void run() {
+	public synchronized void run() {
 		
 		alive = true;
 		
 		while(alive) {
+			
+			//TODO Update -> state -> action
+			
 			if(state==WAITING) {
 				//Check
 			}
@@ -57,8 +62,12 @@ public class Monster extends Sprite implements Runnable {
 				//Move
 				
 				//Attack
-			}			
+			}
+			
+			alive = false;
 		}
+		
+		MonsterService.dyingMonster(this);
 		
 	}
 	
@@ -67,59 +76,59 @@ public class Monster extends Sprite implements Runnable {
 	
 	//a Shitload of getters/setters
 	
-	public String getName() {
+	public synchronized String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public synchronized void setName(String name) {
 		this.name = name;
 	}
 
-	public int getDamage() {
+	public synchronized int getDamage() {
 		return damage;
 	}
 
-	public void setDamage(int damage) {
+	public synchronized void setDamage(int damage) {
 		this.damage = damage;
 	}
 
-	public int getHealth() {
+	public synchronized int getHealth() {
 		return health;
 	}
 
-	public void setHealth(int health) {
+	public synchronized void setHealth(int health) {
 		this.health = health;
 	}
 
-	public int getLevel() {
+	public synchronized int getLevel() {
 		return level;
 	}
 
-	public void setLevel(int level) {
+	public synchronized void setLevel(int level) {
 		this.level = level;
 	}
 
-	public int getAggro() {
+	public synchronized int getAggro() {
 		return aggro;
 	}
 
-	public void setAggro(int aggro) {
+	public synchronized void setAggro(int aggro) {
 		this.aggro = aggro;
 	}
 
-	public String getSpawnLocation() {
+	public synchronized String getSpawnLocation() {
 		return spawnLocation;
 	}
 
-	public void setSpawnLocation(String spawnLocation) {
+	public synchronized void setSpawnLocation(String spawnLocation) {
 		this.spawnLocation = spawnLocation;
 	}
 
-	public boolean isBoss() {
+	public synchronized boolean isBoss() {
 		return boss;
 	}
 
-	public void setBoss(boolean boss) {
+	public synchronized void setBoss(boolean boss) {
 		this.boss = boss;
 	}
 	
