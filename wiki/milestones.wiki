@@ -44,8 +44,8 @@ Before April.
 
 ----
 
-= Milestone 3: Ichthyaetus =
-You can do more stuff now than with the first milestone.
+= Milestone 3: Chroicocephalus =
+You can do more stuff now than with the second milestone.
 
 == Requirements ==
 === Server ===
