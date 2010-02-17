@@ -27,10 +27,13 @@ You can do more stuff now than with the first milestone.
 == Requirements ==
 === Server ===
   * Communicate how the map looks like.
-  * A website where you can register a character and login to play the game.
+
+=== Website ===
+  * Register players, let them create initial character.
+  * Send players to the applet when they log in.
 
 === Client ===
   * Get map-info from the server and show it with the clients mapdata.
 
 == Schedule ==
-Sometime before christmas.
+Before easter?
