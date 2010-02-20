@@ -9,10 +9,9 @@ public class ZincgullServer {
 	
 	public static void main(String[] args) throws SQLException, InterruptedException {
 		MD = new MonsterDatabase();
-		System.out.println("lol1");
-		Thread.sleep(10000);
+		Thread.sleep(5000);
+		System.out.println("Starting MonsterService");
 		MS = new MonsterService();
-		MS.setDaemon(true);
 		MS.start();
 		
 		

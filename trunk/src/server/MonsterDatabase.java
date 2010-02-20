@@ -432,6 +432,7 @@ public class MonsterDatabase {
 	 * @return A Monster-object.
 	 */
 	public static Monster getRandomMonster(String type) {
+		monster = new Monster();
 		
 		if(type==critter) randomMonster(critter);
 		else if(type==lowLevel) randomMonster(lowLevel);

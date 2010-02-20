@@ -23,7 +23,7 @@ public class MonsterService extends Thread {
 	private static int chanceToEndSurge; //one in ..
 	private static long sleep;
 	
-	private static Monster monster[] = new Monster[30];
+	private static Monster[] monster = new Monster[30];
 	private static final boolean active = true; //Monsters spawned are always active/alive, active is used to increase readability.
 	
 	public MonsterService() {
@@ -32,6 +32,17 @@ public class MonsterService extends Thread {
 		chanceOfSurge = 5000; //one in .. every 'sleep'
 		chanceToEndSurge = 20; //one in .. every 'sleep'
 		sleep = 5000;
+	}
+	
+	private static void processDbMonster(Monster template, Monster newMonster) {
+		//TODO Fail Safe - Checks
+		newMonster.setName(template.getName());
+		newMonster.setHealth(template.getHealth());
+		newMonster.setDamage(template.getDamage());
+		newMonster.setLevel(template.getAggro());
+		newMonster.setAggro(template.getAggro());
+		newMonster.setSpawnLocation(template.getSpawnLocation());
+		newMonster.setBoss(template.isBoss());
 	}
 	
 	private static void monsterSurge() {
@@ -46,9 +57,7 @@ public class MonsterService extends Thread {
 				monsterLimit = monsterLimit * 2;
 				
 				while(monsterCount < monsterLimit) {
-					monster = new Monster();
-					monster = MonsterDatabase.getRandomMonster();
-					monster.thread.start();
+					spawn();
 				}
 			}
 		}	
@@ -65,9 +74,13 @@ public class MonsterService extends Thread {
 	
 	private synchronized static void spawn() {
 		
-		System.out.println(monsterCount);
+		System.out.println("in spawn()");
 		
-		monster[monsterCount] = MonsterDatabase.getRandomMonster();
+		System.out.println("MonsterCount: "+monsterCount);
+		
+		monster[monsterCount] = new Monster();
+		processDbMonster(MonsterDatabase.getRandomMonster(), monster[monsterCount]);
+		monster[monsterCount].printStats();
 		monster[monsterCount].thread.start();
 		
 		monsterCount++;
