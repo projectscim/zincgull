@@ -15,9 +15,6 @@ public class ZincgullServer {
 		MS.start();
 		
 		
-		
-		System.out.println("lol3");
-		
 		while(true) {
 			try {
 				Thread.sleep(15000);
@@ -25,7 +22,7 @@ public class ZincgullServer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("Slept");
+			System.out.println("Main Server has Slept");
 		}
 		
 	}

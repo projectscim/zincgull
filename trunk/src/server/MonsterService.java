@@ -3,6 +3,9 @@ package server;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+
 /**
  * (the) MonsterService keeps track of monsters in play and spawn new ones.
  * <p>
@@ -13,6 +16,7 @@ import java.util.Random;
 public class MonsterService extends Thread {
 	
 	private static int monsterCount;
+	private static int monstersSpawned; //Sets id
 	private static int monstersPlains;
 	private static int monstersDesert;
 	private static int monstersForest;
@@ -22,20 +26,33 @@ public class MonsterService extends Thread {
 	private static int chanceOfSurge; //one in ..
 	private static int chanceToEndSurge; //one in ..
 	private static long sleep;
+	private static Logger log;
 	
 	private static Monster[] monster = new Monster[30];
 	private static final boolean active = true; //Monsters spawned are always active/alive, active is used to increase readability.
 	
 	public MonsterService() {
-		isSurge = false;
+		log = Logger.getLogger("MonsterService");
+		BasicConfigurator.configure();
+		log.info("MonsterService created");
+		
 		monsterLimit = 15;
 		chanceOfSurge = 5000; //one in .. every 'sleep'
-		chanceToEndSurge = 20; //one in .. every 'sleep'
+		chanceToEndSurge = 10; //one in .. every 'sleep'
+		log.info("Monster limit is set to: "+monsterLimit);
+		log.info("Chance of Surge is set to: "+chanceOfSurge);
+		log.info("Chance to end surge is set to: "+chanceToEndSurge);
+		
 		sleep = 5000;
+		isSurge = false;
+		log.info("Once started, MonsterService sleep: "+(sleep/1000)+" s during each loop");
+		log.info("Ongoing Surge: "+isSurge);
 	}
 	
 	private static void processDbMonster(Monster template, Monster newMonster) {
 		//TODO Fail Safe - Checks
+		log.debug("Processing monster from DB");
+		
 		newMonster.setName(template.getName());
 		newMonster.setHealth(template.getHealth());
 		newMonster.setDamage(template.getDamage());
@@ -43,16 +60,22 @@ public class MonsterService extends Thread {
 		newMonster.setAggro(template.getAggro());
 		newMonster.setSpawnLocation(template.getSpawnLocation());
 		newMonster.setBoss(template.isBoss());
+		
 	}
 	
 	private static void monsterSurge() {
-		/*Random randomize = new Random();
+		Random randomize = new Random();
 		int random;
+		int surgeInt = 42;
+		int surgeEnd = 0;
 		
 		if(!isSurge) {
 			random = randomize.nextInt(chanceOfSurge);
+			log.debug("Randomizing for Surge, "+surgeInt+" will start surge");
+			log.debug("Randomized: "+random);
 			
-			if(random == 42) {
+			if(random == surgeInt) {
+				log.info("MONSTER SURGE!");
 				isSurge=true;
 				monsterLimit = monsterLimit * 2;
 				
@@ -60,60 +83,81 @@ public class MonsterService extends Thread {
 					spawn();
 				}
 			}
-		}	
+		}
 		else {
 			random = randomize.nextInt(chanceToEndSurge);
+			log.debug("Randomizing to end Surge, "+surgeEnd+" will end surge");
+			log.debug("Randomized: "+random);
 			
-			if(random==0) {
+			if(random == surgeEnd) {
+				log.info("MONSTER SURGE Ended");
 				isSurge = false;
 				monsterLimit = monsterLimit / 2;
 			}
-		}*/
+		}
 		
 	}
 	
-	private synchronized static void spawn() {
+	private static void normal() {
+		if(monsterLimit > monsterCount) {
+			spawn();
+		}
+		else {
+			log.debug("Not Spawning new Monster due to limit");
+			log.debug("MonsterLimit: "+monsterLimit);
+			log.debug("Monsters Alive: "+monsterCount);
+		}
+	}
+	
+	private static void spawn() {
+		log.debug("Spawning new Monster");
 		
-		System.out.println("in spawn()");
+		//Set up new Monster
+		monster[monstersSpawned] = new Monster();
+		processDbMonster(MonsterDatabase.getRandomMonster(), monster[monstersSpawned]);
 		
-		System.out.println("MonsterCount: "+monsterCount);
+		//Tell debug
+		log.debug("Spawned: \""+monster[monstersSpawned].getName()+"\" in: "+monster[monstersSpawned].getSpawnLocation());
 		
-		monster[monsterCount] = new Monster();
-		processDbMonster(MonsterDatabase.getRandomMonster(), monster[monsterCount]);
-		monster[monsterCount].printStats();
-		monster[monsterCount].thread.start();
+		//Start new Monster
+		monster[monstersSpawned].thread.start();
 		
+		//Count
+		monstersSpawned++;
 		monsterCount++;
+		log.debug("Monsters Spawned total: "+monstersSpawned);
+		log.debug("Monsters Alive: "+monsterCount);
+	}
+	
+	public static void dyingMonster(Monster deadMonster) {
+		log.debug("This Monster is dying: \""+deadMonster.getName()+"\"");
 		
+		monsterCount--;
+		log.debug("MonsterCount is now: "+monsterCount);
 	}
 	
-	public synchronized static void dyingMonster(Monster deadMonster) {
-		System.out.println("this monster is dying:");
-		deadMonster.printStats();
-	}
-	
-	public synchronized static void setIsSurge(boolean statement) {
+	public static void setIsSurge(boolean statement) {
 		if(statement) isSurge = true;
 		else isSurge = false;
 	}
 
-	public synchronized void run() {
+	public void run() {
 		while(true) {
 			//Slight chance of Monster Surge starting
 			//Significant chance of Monster Surge ending
-			//monsterSurge();
-			synchronized(new Object()) {
-				spawn();
-				
-				monster[0].printStats();
-			}
+			monsterSurge();
+			
+			//Normal spawn
+			normal();
+			
 			
 			
 			//Sleep
 			try {
+				log.debug("MonsterService will sleep for "+(sleep/1000)+" s");
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
-				System.out.println("MonsterService Failed to sleep");
+				log.debug("MonsterService Failed to sleep");
 				e.printStackTrace();
 			}
 			
