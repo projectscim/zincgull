@@ -119,6 +119,9 @@ public class MonsterService extends Thread {
 		//Tell debug
 		log.debug("Spawned: \""+monster[monstersSpawned].getName()+"\" in: "+monster[monstersSpawned].getSpawnLocation());
 		
+		//Add new monster to MapServer
+		addToMap(monster[monstersSpawned]);
+		
 		//Start new Monster
 		monster[monstersSpawned].thread.start();
 		
@@ -129,6 +132,11 @@ public class MonsterService extends Thread {
 		log.debug("Monsters Alive: "+monsterCount);
 	}
 	
+	private static void addToMap(Monster newMonster) {
+
+		
+	}
+
 	public static void dyingMonster(Monster deadMonster) {
 		log.debug("This Monster is dying: \""+deadMonster.getName()+"\"");
 		
@@ -149,8 +157,6 @@ public class MonsterService extends Thread {
 			
 			//Normal spawn
 			normal();
-			
-			
 			
 			//Sleep
 			try {
