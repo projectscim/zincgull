@@ -12,6 +12,9 @@ public class Monster extends Sprite implements Runnable {
 	
 	Thread thread = new Thread(this);
 	
+	private int sleep = 50;
+	private static final int range = 5;
+	
 	//Stats
 	private String name;
 	private int damage;
@@ -24,6 +27,7 @@ public class Monster extends Sprite implements Runnable {
 	
 	//Active
 	private int state;
+	private static final int DEAD = -1;
 	private static final int WAITING = 0;
 	private static final int ATTACKING = 1;
 	
@@ -51,31 +55,61 @@ public class Monster extends Sprite implements Runnable {
 		
 		while(alive) {
 			
-			//TODO Update -> state -> action
+			//Update state
+			update();
 			
 			if(state==WAITING) {
-				//Check
+				//do nothing
+				sleep = 1000;
 			}
 			else if(state==ATTACKING) {
-				//Check
+				checkRange();
 				
-				//Move
+				move();
 				
-				//Attack
+				attack();
+				
+				sleep = 20;
+			}
+			else if(state==DEAD) {
+				alive = false;
+				sleep = 0;
 			}
 			
-			alive = false;
+			//Sleep a bit
+			try {
+				Thread.sleep(sleep);
+			} catch (InterruptedException e) {}
+			
 		}
 		
 		MonsterService.dyingMonster(this);
 		
 	}
 	
-	
+	private void checkRange() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void move() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void attack() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void update() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	//a Shitload of getters/setters
-	
+
 	public synchronized String getName() {
 		return name;
 	}
