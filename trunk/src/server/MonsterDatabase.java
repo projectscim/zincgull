@@ -15,6 +15,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
 
+import local.SecretDBinfo;
+
 /**
  * The MonsterDatabase returns Monster objects.<br>
  * MonsterDatbase loads Monsters from a specified (hardcoded) MySQL-database, if connection to the database fails it tries to load from a local backup instead. 
@@ -35,7 +37,7 @@ import java.util.Random;
 
  // TODO Possibility to backup monsterlists.
 
-public class MonsterDatabase {
+public class MonsterDatabase implements SecretDBinfo {
 	
 	private static Random randomize;
 	private static int random;
@@ -51,12 +53,7 @@ public class MonsterDatabase {
 	private static ArrayList<Monster> highLevelList = new ArrayList<Monster>();
 	private static ArrayList<Monster> bossList = new ArrayList<Monster>();
 	
-	//MySQL-Database
-	private static final String host = "localhost";
-	private static final String database = "arxe_java";
-	private static final String url = "jdbc:mysql://"+host+"/"+database;
-	private static final String user = "arxe";
-	private static final String pass = "asdf";
+	//MySQL-Database (info from SecretDBinfo)
 	private static Connection conn = null;
 	
 	//Local Backup Database 
