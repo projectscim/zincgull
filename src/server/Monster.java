@@ -166,4 +166,12 @@ public class Monster extends Sprite implements Runnable {
 		this.boss = boss;
 	}
 	
+	public synchronized void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+	
+	public synchronized boolean getAlive() {
+		return alive;
+	}
+	
 }

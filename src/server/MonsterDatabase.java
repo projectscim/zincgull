@@ -36,6 +36,7 @@ import local.SecretDBinfo;
  */
 
  // TODO Possibility to backup monsterlists.
+ // TODO Skip the loading of monsters and query the database instead.
 
 public class MonsterDatabase implements SecretDBinfo {
 	
