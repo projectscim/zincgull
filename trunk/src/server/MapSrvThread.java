@@ -6,14 +6,29 @@ public class MapSrvThread extends Thread {
 	private MapSrv server;
 	private Socket socket;
 	private Double user;
+	private Monster monster;
+	private boolean isMonster;
 
 	public MapSrvThread( MapSrv server, Socket socket ) {
 		this.server = server;
 		this.socket = socket;
+		isMonster = false;
+		start();
+	}
+	
+	public MapSrvThread(MapSrv server, Monster monster) {
+		this.server = server;
+		this.monster = monster; 
+		isMonster = true;
 		start();
 	}
 
-	public void run() {	
+	public void run() {
+		if(isMonster) monsterRun();
+		else playerRun();
+	}
+	
+	private void playerRun() {
 		try {
 			DataInputStream dis = new DataInputStream( socket.getInputStream() );	//gets messages from client
 			while (true) {
@@ -32,6 +47,26 @@ public class MapSrvThread extends Thread {
 		} finally {
 			server.removeConnection( socket, user );	//closing socket when connection is lost
 		}
+	}
+	
+	private void monsterRun() {
+		System.out.println("MonsterRunMapServer");
+		
+		while(monster.getAlive()) {
+			String coords = monster.getCoords();
+			String[] temp;
+			temp = coords.split(":");
+			user = Double.parseDouble(temp[4]);
+			MapSrv.positions.set(MapSrv.getId(user), coords);
+			server.sendToAll(coords);
+			System.out.println("MAP "+MapSrv.getTime()+": COORDS: "+coords);
+			System.out.println(monster.getName());
+			try {
+				Thread.sleep(20);
+			} catch (InterruptedException e) {}
+		}
+
+		//TODO Remove
 	}
 	
 	void sendTo( String message ) {

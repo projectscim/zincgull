@@ -5,39 +5,40 @@ import java.net.*;
 import java.text.DateFormat;
 import java.util.*;
 
-public class MapSrv {
+public class MapSrv extends Thread {
 	private ServerSocket ss;
 	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
 	protected static LinkedList<String> positions = new LinkedList<String>();
 	
-	// Constructor and while-accept loop
-	public MapSrv( int port ) {
-		try {
-			listen( port );
-		} catch (IOException e) {
-			System.out.println( "ERR "+getTime()+": Something failed");
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
+	private static final int port = 49051;
 	
 	// Usage: java Server <port>
 	static public void main( String args[] ){
-		new MapSrv( 49051 );	//create server
+		new MapSrv();	//create server
 	}
 	
-	private void listen( int port ) throws IOException {
-		ss = new ServerSocket( port );
-		System.out.println( "INF "+getTime()+": Started the Zincgull Mapserver on port "+port+"\n              listening on "+ss );
-		
-		while (true) {	//accepting connections forever
-			Socket s = ss.accept();		//grab a connection
-			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
-			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
-			getOutputStreams().put( s, dos );		//saving the stream
-			new MapSrvThread( this, s );		//create a new thread for the stream
+	public void addMonster(Monster monster) {
+		new MapSrvThread(this, monster);
+	}
+	
+	public void run() {
+		try {
+			ss = new ServerSocket( port );
+			System.out.println( "INF "+getTime()+": Started the Zincgull Mapserver on port "+port+"\n              listening on "+ss );
+			
+			while (true) {	//accepting connections forever
+				Socket s = ss.accept();		//grab a connection
+				System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
+				DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
+				getOutputStreams().put( s, dos );		//saving the stream
+				new MapSrvThread( this, s );		//create a new thread for the stream
+			}
+		} catch (IOException e) {
+			System.out.println( "ERR "+getTime()+": Something failed");
+			e.printStackTrace();
 		}
+		
 	}
 	// Enumerate all OutputStreams
 	Enumeration<DataOutputStream> enumOutputStreams() {
