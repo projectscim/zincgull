@@ -50,23 +50,22 @@ public class MapSrvThread extends Thread {
 	}
 	
 	private void monsterRun() {
-		System.out.println("MonsterRunMapServer");
+		System.out.println("MonsterRunMapServer");	
 		
 		while(monster.getAlive()) {
 			String coords = monster.getCoords();
 			String[] temp;
 			temp = coords.split(":");
 			user = Double.parseDouble(temp[4]);
-			MapSrv.positions.set(MapSrv.getId(user), coords);
+			MapSrv.monsterPositions.set(MapSrv.getId(user), coords);
 			server.sendToAll(coords);
-			System.out.println("MAP "+MapSrv.getTime()+": COORDS: "+coords);
-			System.out.println(monster.getName());
+			//System.out.println("MAP "+MapSrv.getTime()+": COORDS: "+coords);
 			try {
-				Thread.sleep(20);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {}
 		}
 
-		//TODO Remove
+		server.removeMonster(user);
 	}
 	
 	void sendTo( String message ) {

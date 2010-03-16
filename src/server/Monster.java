@@ -12,7 +12,8 @@ public class Monster extends Sprite implements Runnable {
 	
 	Thread thread = new Thread(this);
 	
-	private int sleep = 50;
+	private static final int idleSleep = 2000;
+	private int activeSleep = 50;
 	private static final int range = 5;
 	
 	//Stats
@@ -23,7 +24,6 @@ public class Monster extends Sprite implements Runnable {
 	private int aggro;
 	private String spawnLocation;
 	private boolean boss;
-	private int speed = 1;		//TODO add to MonsterDatabase
 	
 	//Active
 	private int state;
@@ -34,16 +34,18 @@ public class Monster extends Sprite implements Runnable {
 	private boolean alive;
 	
 	public Monster() {
-		
+		id = -1;
 	}
 	
 	public synchronized void printStats() {
 		System.out.println("--MONSTER STATS--");
+		System.out.println("Id: "+id); //From Sprite
 		System.out.println("Name: "+name);
 		System.out.println("Health: "+health);
 		System.out.println("Damage: "+damage);
 		System.out.println("Level: "+level);
 		System.out.println("Aggro: "+aggro);
+		System.out.println("Speed: "+speed); //From Sprite
 		System.out.println("Spawn: "+spawnLocation);
 		System.out.println("Boss: "+boss);
 		System.out.println("--------------");
@@ -60,7 +62,7 @@ public class Monster extends Sprite implements Runnable {
 			
 			if(state==WAITING) {
 				//do nothing
-				sleep = 1000;
+				activeSleep = idleSleep;
 			}
 			else if(state==ATTACKING) {
 				checkRange();
@@ -69,16 +71,16 @@ public class Monster extends Sprite implements Runnable {
 				
 				attack();
 				
-				sleep = 20;
+				activeSleep = 20;
 			}
 			else if(state==DEAD) {
 				alive = false;
-				sleep = 0;
+				activeSleep = 0;
 			}
 			
 			//Sleep a bit
 			try {
-				Thread.sleep(sleep);
+				Thread.sleep(activeSleep);
 			} catch (InterruptedException e) {}
 			
 		}
@@ -109,7 +111,14 @@ public class Monster extends Sprite implements Runnable {
 	
 	
 	//a Shitload of getters/setters
-
+	public synchronized int getId() {
+		return id;
+	}
+	
+	public synchronized void setId(int id) {
+		this.id = id;
+	}
+	
 	public synchronized String getName() {
 		return name;
 	}

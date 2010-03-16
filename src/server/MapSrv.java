@@ -10,16 +10,27 @@ public class MapSrv extends Thread {
 	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
 	protected static LinkedList<String> positions = new LinkedList<String>();
+	protected static LinkedList<String> monsterPositions = new LinkedList<String>();
+	private static int port;
 	
-	private static final int port = 49051;
+	public MapSrv(int port) {
+		MapSrv.port = port;
+	}
 	
 	// Usage: java Server <port>
 	static public void main( String args[] ){
-		new MapSrv();	//create server
+		port = 49051;
+		new MapSrv(port);	//create server
 	}
 	
 	public void addMonster(Monster monster) {
-		new MapSrvThread(this, monster);
+		if(monsterPositions.size()+1==monster.getId()) {
+			monsterPositions.add(monster.getCoords());
+			new MapSrvThread(this, monster);
+		}
+		else {
+			System.out.println("FATAL ERROR: Unable to add monster to mapServer due to index issue.");
+		}
 	}
 	
 	public void run() {
@@ -72,6 +83,10 @@ public class MapSrv extends Thread {
 				ie.printStackTrace();
 			}
 		}
+	}
+	
+	void removeMonster(double d ) {
+			monsterPositions.remove(getId(d));
 	}
 	
 	public static int getId(Double d){
