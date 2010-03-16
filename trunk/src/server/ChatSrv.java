@@ -5,21 +5,17 @@ import java.net.*;
 import java.text.DateFormat;
 import java.util.*;
 
-public class ChatSrv {
+public class ChatSrv extends Thread {
 	private ServerSocket ss;
 	//this is used to don't have to create a DOS every time you are writing to a stream
 	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
 	protected static LinkedList<String> nick = new LinkedList<String>();
 	
+	private static int port;
+	
 	// Constructor and while-accept loop
 	public ChatSrv( int port ) {
-		try {
-			listen( port );
-		} catch (IOException e) {
-			System.out.println( "ERR "+getTime()+": Something failed");
-			e.printStackTrace();
-			System.exit(1);
-		}
+		ChatSrv.port = port;
 	}
 	
 	// Usage: java Server <port>
@@ -27,17 +23,22 @@ public class ChatSrv {
 		new ChatSrv( 49050 );	//create server
 	}
 	
-	private void listen( int port ) throws IOException {
-		ss = new ServerSocket( port );
-		System.out.println( "INF "+getTime()+": Started the Zincgull chatserver on port "+port+"\n              listening on "+ss );
-		
-		while (true) {	//accepting connections forever
-			Socket s = ss.accept();		//grab a connection
-			System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
-			DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
-			getOutputStreams().put( s, dos );		//saving the stream
-			new ChatSrvThread( this, s );		//create a new thread for the stream
+	public void run() {
+		try {
+			ss = new ServerSocket( port );
+			System.out.println( "INF "+getTime()+": Started the Zincgull chatserver on port "+port+"\n              listening on "+ss );
+			
+			while (true) {	//accepting connections forever
+				Socket s = ss.accept();		//grab a connection
+				System.out.println( "USR "+getTime()+": New connection from "+s );	//msg about the new connection
+				DataOutputStream dos = new DataOutputStream( s.getOutputStream() );	//DOS used to write to client
+				getOutputStreams().put( s, dos );		//saving the stream
+				new ChatSrvThread( this, s );		//create a new thread for the stream
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		
 	}
 	// Enumerate all OutputStreams
 	Enumeration<DataOutputStream> enumOutputStreams() {

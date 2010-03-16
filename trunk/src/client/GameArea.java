@@ -9,6 +9,12 @@ import java.util.LinkedList;
 import javax.swing.*;
 
 public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable{
+	
+	//TEMP
+	private URL url;
+	public static ImageIcon monsterImg;
+	
+	
 	private static final long serialVersionUID = -5572295459928673608L;
 	
 	private Socket socket;		//socket connecting to server
@@ -21,6 +27,15 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	
 	public GameArea() {		
+		
+		//TEMP!
+		try {
+			url = new URL("http://utterfanskap.se/images/monster.png");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		monsterImg = new ImageIcon(url);
+		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
       	this.setDoubleBuffered(true);
@@ -37,6 +52,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				g.drawImage(p.sprite.getImage(), p.xpos-p.turned*(100/2), p.ypos, p.turned*100, 50, null);
 			}
 		}
+		
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
 		}

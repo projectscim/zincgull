@@ -1,6 +1,5 @@
 package server;
 
-import java.sql.SQLException;
 import java.util.Random;
 
 import org.apache.log4j.BasicConfigurator;
@@ -14,12 +13,12 @@ import org.apache.log4j.Logger;
  * @author Andreas
  */
 public class MonsterService extends Thread {
-	
+		
 	private static int monsterCount;
 	private static int monstersSpawned; //Sets id
-	private static int monstersPlains;
-	private static int monstersDesert;
-	private static int monstersForest;
+	//private static int monstersPlains;
+	//private static int monstersDesert;
+	//private static int monstersForest;
 	
 	private static int monsterLimit;
 	private static boolean isSurge;
@@ -28,15 +27,17 @@ public class MonsterService extends Thread {
 	private static long sleep;
 	private static Logger log;
 	
-	private static Monster[] monster = new Monster[30];
-	private static final boolean active = true; //Monsters spawned are always active/alive, active is used to increase readability.
+	//private static Monster[] monster = new Monster[30]; CHANGES also in spawn().
+	private static Monster monster;
+	private static MapSrv mapSrv;
 	
-	public MonsterService() {
+	public MonsterService(MapSrv mapSrv) {
 		log = Logger.getLogger("MonsterService");
 		BasicConfigurator.configure();
 		log.info("MonsterService created");
 		
-		monsterLimit = 15;
+		MonsterService.mapSrv = mapSrv;
+		monsterLimit = 1;
 		chanceOfSurge = 5000; //one in .. every 'sleep'
 		chanceToEndSurge = 10; //one in .. every 'sleep'
 		log.info("Monster limit is set to: "+monsterLimit);
@@ -113,17 +114,25 @@ public class MonsterService extends Thread {
 		log.debug("Spawning new Monster");
 		
 		//Set up new Monster
-		monster[monstersSpawned] = new Monster();
-		processDbMonster(MonsterDatabase.getRandomMonster(), monster[monstersSpawned]);
+		//monster[monstersSpawned] = new Monster();
+		monster = new Monster();
+		//processDbMonster(MonsterDatabase.getRandomMonster(), monster[monstersSpawned]);
+		processDbMonster(MonsterDatabase.getRandomMonster(), monster);
+		//Set ID!!
+		monster.setId(monstersSpawned +1); //+1, monstersSpwaned havn't been up'd yet. 
 		
 		//Tell debug
-		log.debug("Spawned: \""+monster[monstersSpawned].getName()+"\" in: "+monster[monstersSpawned].getSpawnLocation());
+		//log.debug("Spawned: \""+monster[monstersSpawned].getName()+"\" in: "+monster[monstersSpawned].getSpawnLocation());
+		log.debug("Spawned: \""+monster.getName()+"\" in: "+monster.getSpawnLocation()+" Id: "+monster.getId());
 		
 		//Add new monster to MapServer
-		addToMap(monster[monstersSpawned]);
+		//addToMap(monster[monstersSpawned]);
+		addToMap(monster);
+		monster.setAlive(true);
 		
 		//Start new Monster
-		monster[monstersSpawned].thread.start();
+		//monster[monstersSpawned].thread.start();
+		monster.thread.start();
 		
 		//Count
 		monstersSpawned++;
@@ -133,8 +142,7 @@ public class MonsterService extends Thread {
 	}
 	
 	private static void addToMap(Monster newMonster) {
-
-		
+		mapSrv.addMonster(newMonster);
 	}
 
 	public static void dyingMonster(Monster deadMonster) {

@@ -12,14 +12,14 @@ public class Sprite {
 	protected int ypos = 75;
 	protected int turned = 1;
 	protected int speed = 5;
-	protected double id;
+	protected int id;
 	protected String coords;
 	
 	public Sprite() {
 		
 	}
 	
-	public Sprite(int x, int y, int s, double i) {
+	public Sprite(int x, int y, int s, int i) {
 		try {
 			url = new URL( "http://zincgull.rodstrom.se/zincgull.png" );
 		} catch (MalformedURLException e) {
@@ -36,7 +36,8 @@ public class Sprite {
 		coords = (String.valueOf(xpos)+":"
 				+ String.valueOf(ypos)+":"
 				+ String.valueOf(turned)+":"
-				+ String.valueOf(speed));
+				+ String.valueOf(speed)+":"
+				+ String.valueOf(id));
 	
 		return coords;
 	}
