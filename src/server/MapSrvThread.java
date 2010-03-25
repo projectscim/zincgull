@@ -7,7 +7,7 @@ public class MapSrvThread extends Thread {
 	private Socket socket;
 	private Double user;
 	private Monster monster;
-	private boolean isMonster;
+	private boolean isMonster; //TODO Remove? Remove monsterRun? Don't forget stuff in specialCommand!
 
 	public MapSrvThread( MapSrv server, Socket socket ) {
 		this.server = server;
@@ -50,7 +50,7 @@ public class MapSrvThread extends Thread {
 	}
 	
 	private void monsterRun() {
-		System.out.println("MonsterRunMapServer");	
+		boolean first = true; //Say HELLO to MapSrv & GameArea
 		
 		while(monster.getAlive()) {
 			String coords = monster.getCoords();
@@ -58,14 +58,16 @@ public class MapSrvThread extends Thread {
 			temp = coords.split(":");
 			user = Double.parseDouble(temp[4]);
 			MapSrv.monsterPositions.set(MapSrv.getId(user), coords);
+			
+			if(first) specialCommand("/HELLO"+coords);
+			
 			server.sendToAll(coords);
-			//System.out.println("MAP "+MapSrv.getTime()+": COORDS: "+coords);
+			first = false;
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {}
 		}
 
-		server.removeMonster(user);
 	}
 	
 	void sendTo( String message ) {
@@ -83,13 +85,19 @@ public class MapSrvThread extends Thread {
 			String[] temp;
 			temp = msg.split(":");
 			user = Double.parseDouble(temp[4]);
-			sendTo("/HELLO Welcome to the Zincgull mapserver!");		//welcome-message
 			
-			for (int i = 0; i < MapSrv.positions.size(); i++) {
-				sendTo("/ADD "+MapSrv.positions.get(i));
-			}
+			if(!isMonster) {
+				sendTo("/HELLO Welcome to the Zincgull mapserver!");	//welcome-message
+				for (int i = 0; i < MapSrv.positions.size(); i++) {
+					sendTo("/ADD "+MapSrv.positions.get(i));
+				}
 
-			MapSrv.positions.add(msg);
+				MapSrv.positions.add(msg);
+			}
+			else {
+				MapSrv.monsterPositions.add(msg);
+			}
+			
 			server.sendToAll("/ADD "+msg);
 			return true;
 		}

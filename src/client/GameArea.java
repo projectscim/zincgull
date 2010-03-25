@@ -8,6 +8,8 @@ import java.util.LinkedList;
 
 import javax.swing.*;
 
+import server.Monster;
+
 public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable{
 	
 	//TEMP
@@ -25,15 +27,14 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	boolean[] arrowDown = new boolean[4];
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
+	protected static LinkedList<Monster> monster = new LinkedList<Monster>();
 	
-	public GameArea() {		
+	public GameArea() {
 		
 		//TEMP!
 		try {
 			url = new URL("http://utterfanskap.se/images/monster.png");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		} catch (MalformedURLException e) {}
 		monsterImg = new ImageIcon(url);
 		
       	this.addKeyListener(this);
@@ -53,6 +54,11 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			}
 		}
 		
+		for (int i = 0; i < monster.size(); i++) {
+			Monster m = monster.get(i);
+			g.drawImage(m.getImg().getImage(), m.xpos-m.turned*(100/2), m.ypos, 100, 150, null);
+		}
+		
 		if(Zincgull.isMouseActive()){
 			this.requestFocus();
 		}
@@ -66,14 +72,38 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				if (!specialCommand(coords)) {
 					String[] temp;
 					temp = coords.split(":");
-					Player ps = player.get(getId(Double.valueOf(temp[4])));
-					if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
-						ps.xpos = Integer.parseInt(temp[0]);
-						ps.ypos = Integer.parseInt(temp[1]);
-						ps.turned = Integer.parseInt(temp[2]);
-						ps.speed = Integer.parseInt(temp[3]);
+					
+					if(Double.valueOf(temp[4])<1 && Double.valueOf(temp[4])!=0) { //if player
+						Player ps = player.get(getId(Double.valueOf(temp[4])));
+						if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
+							ps.xpos = Integer.parseInt(temp[0]);
+							ps.ypos = Integer.parseInt(temp[1]);
+							ps.turned = Integer.parseInt(temp[2]);
+							ps.speed = Integer.parseInt(temp[3]);
+							repaint();
+						}	
+					}
+					else if((getMonster(temp[4]))==-1) {
+						int x = Integer.parseInt(temp[0]);
+						int y = Integer.parseInt(temp[1]);
+						int s = Integer.parseInt(temp[2]);
+						int t = Integer.parseInt(temp[3]);
+						int i = Integer.parseInt(temp[4]);
+						
+						monster.add(new Monster(x,y,t,s,i));
+						
 						repaint();
 					}
+					else {
+						Monster m = monster.get(getMonster(temp[4]));
+						
+						m.xpos = Integer.parseInt(temp[0]);
+						m.ypos = Integer.parseInt(temp[1]);
+						m.turned = Integer.parseInt(temp[2]);
+						m.speed = Integer.parseInt(temp[3]);
+						repaint();
+					}
+					
 				}
 			}
 		} catch( IOException ie ) {
@@ -91,6 +121,16 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		}
 	}
 
+	private int getMonster(String sid) {
+		int id = Integer.valueOf(sid);
+		for (int i = 0; i < monster.size(); i++) {
+			if(monster.get(i).getId() == id) {	//needs to be unique
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	private void sendData() {
 		Player p = player.get(getId(Zincgull.random));
 		try {
@@ -100,7 +140,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		}
 	}
 	
-	public void connect(boolean first, String position){
+	public void connect(boolean first, String position) {
 		while (true) {
 			try {
 				socket = new Socket(Zincgull.host, port);
@@ -185,11 +225,13 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			int y = Integer.parseInt(temp[1]);
 			int s = Integer.parseInt(temp[2]);
 			int t = Integer.parseInt(temp[3]);
-			double i = Double.parseDouble(temp[4]);		
+			double i = Double.parseDouble(temp[4]);	
+			
 			player.add(new Player(x,y,t,s,i));
 			Zincgull.connected = true;
 			repaint();
-			return true;
+			return true;	
+			
 		}else if( msg.substring(0, 4).equals("/SUB") ){
 			//player.remove(getId( Double.parseDouble(temp[4]) ));
 			player.set(getId(Double.parseDouble(msg.substring(5))), new Player(0,0,0,0,0.0));

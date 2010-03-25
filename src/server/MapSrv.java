@@ -8,7 +8,7 @@ import java.util.*;
 public class MapSrv extends Thread {
 	private ServerSocket ss;
 	//this is used to don't have to create a DOS every time you are writing to a stream
-	private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
+	static private Hashtable<Socket, DataOutputStream> outputStreams = new Hashtable<Socket, DataOutputStream>();
 	protected static LinkedList<String> positions = new LinkedList<String>();
 	protected static LinkedList<String> monsterPositions = new LinkedList<String>();
 	private static int port;
@@ -23,14 +23,15 @@ public class MapSrv extends Thread {
 		new MapSrv(port);	//create server
 	}
 	
-	public void addMonster(Monster monster) {
-		if(monsterPositions.size()+1==monster.getId()) {
-			monsterPositions.add(monster.getCoords());
-			new MapSrvThread(this, monster);
-		}
-		else {
-			System.out.println("FATAL ERROR: Unable to add monster to mapServer due to index issue.");
-		}
+	public static void addMonster(int id, String coords) {
+		//atm, monsterId will be same as index. TODO A decent id-system.
+		monsterPositions.add(coords);
+		sendToAll(coords);
+	}
+	
+	public static void monsterUpdate(int id, String coords) {
+		monsterPositions.add(coords);
+		sendToAll(coords);
 	}
 	
 	public void run() {
@@ -52,11 +53,11 @@ public class MapSrv extends Thread {
 		
 	}
 	// Enumerate all OutputStreams
-	Enumeration<DataOutputStream> enumOutputStreams() {
+	static Enumeration<DataOutputStream> enumOutputStreams() {
 		return getOutputStreams().elements();
 	}
 	
-	void sendToAll( String message ) {
+	static void sendToAll( String message ) {
 		synchronized( getOutputStreams() ) {		//sync so that no other thread screws this one over
 			for (Enumeration<?> e = enumOutputStreams(); e.hasMoreElements(); ) {
 				DataOutputStream dos = (DataOutputStream)e.nextElement();		//get all outputstreams
@@ -69,7 +70,7 @@ public class MapSrv extends Thread {
 		}
 	}
 	
-	void removeConnection( Socket s, double d ) {		//run when connection is discovered dead
+	static void removeConnection( Socket s, double d ) {		//run when connection is discovered dead
 		synchronized( getOutputStreams() ) {		//dont mess up sendToAll
 			positions.remove(getId(d));
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
@@ -83,10 +84,6 @@ public class MapSrv extends Thread {
 				ie.printStackTrace();
 			}
 		}
-	}
-	
-	void removeMonster(double d ) {
-			monsterPositions.remove(getId(d));
 	}
 	
 	public static int getId(Double d){
@@ -106,12 +103,14 @@ public class MapSrv extends Thread {
 		return time.format(date);
 	}
 
-	public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
-		this.outputStreams = outputStreams;
+	static public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
+		outputStreams = outputStreams;
 	}
 
-	public Hashtable<Socket, DataOutputStream> getOutputStreams() {
+	static public Hashtable<Socket, DataOutputStream> getOutputStreams() {
 		return outputStreams;
 	}
+
+
 }
 

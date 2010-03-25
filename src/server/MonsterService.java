@@ -1,5 +1,6 @@
 package server;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import org.apache.log4j.BasicConfigurator;
@@ -27,9 +28,9 @@ public class MonsterService extends Thread {
 	private static long sleep;
 	private static Logger log;
 	
-	//private static Monster[] monster = new Monster[30]; CHANGES also in spawn().
 	private static Monster monster;
 	private static MapSrv mapSrv;
+	private static LinkedList<Monster> monsterList = new LinkedList<Monster>();
 	
 	public MonsterService(MapSrv mapSrv) {
 		log = Logger.getLogger("MonsterService");
@@ -116,23 +117,25 @@ public class MonsterService extends Thread {
 		//Set up new Monster
 		//monster[monstersSpawned] = new Monster();
 		monster = new Monster();
-		//processDbMonster(MonsterDatabase.getRandomMonster(), monster[monstersSpawned]);
 		processDbMonster(MonsterDatabase.getRandomMonster(), monster);
+		
 		//Set ID!!
-		monster.setId(monstersSpawned +1); //+1, monstersSpwaned havn't been up'd yet. 
+		monster.setId(monstersSpawned ); //starts from 0 until decent id-system is in place          (+1, monstersSpwaned havn't been up'd yet.)
 		
 		//Tell debug
-		//log.debug("Spawned: \""+monster[monstersSpawned].getName()+"\" in: "+monster[monstersSpawned].getSpawnLocation());
 		log.debug("Spawned: \""+monster.getName()+"\" in: "+monster.getSpawnLocation()+" Id: "+monster.getId());
 		
 		//Add new monster to MapServer
-		//addToMap(monster[monstersSpawned]);
-		addToMap(monster);
+		addToMap(monster.getId(),monster.getXpos(),monster.getYpos(),monster.getTurned(),monster.getSpeed());
+		
+		//It's alive.
 		monster.setAlive(true);
 		
+		//Add to list
+		monsterList.add(monster); //atm, monsterId will be same as index. TODO A decent id-system.
+		
 		//Start new Monster
-		//monster[monstersSpawned].thread.start();
-		monster.thread.start();
+		monsterList.get((monster.getId())).thread.start();
 		
 		//Count
 		monstersSpawned++;
@@ -141,8 +144,16 @@ public class MonsterService extends Thread {
 		log.debug("Monsters Alive: "+monsterCount);
 	}
 	
-	private static void addToMap(Monster newMonster) {
-		mapSrv.addMonster(newMonster);
+	private static void addToMap(int id, int xpos, int ypos, int turned, int speed) {
+		String spawnCoords;
+		
+		if(xpos == Monster.DEFAULT_XPOS  && ypos == Monster.DEFAULT_YPOS) {
+			//TODO Calculate and set spawn area.
+		}
+		
+		spawnCoords = String.valueOf(id)+":"+String.valueOf(xpos)+":"+String.valueOf(ypos)+":"+String.valueOf(turned)+":"+String.valueOf(speed);
+		
+		mapSrv.addMonster(id, spawnCoords);
 	}
 
 	public static void dyingMonster(Monster deadMonster) {

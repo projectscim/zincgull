@@ -1,5 +1,10 @@
 package server;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+
 import client.Sprite;
 
 /**
@@ -15,6 +20,11 @@ public class Monster extends Sprite implements Runnable {
 	private static final int idleSleep = 2000;
 	private int activeSleep = 50;
 	private static final int range = 5;
+
+	public static final int DEFAULT_XPOS = 100;
+	public static final int DEFAULT_YPOS = 100;
+	
+	private int id;
 	
 	//Stats
 	private String name;
@@ -33,8 +43,29 @@ public class Monster extends Sprite implements Runnable {
 	
 	private boolean alive;
 	
+	private URL url;
+	private ImageIcon sprite;
+	
 	public Monster() {
-		id = -1;
+		id = 0;
+		xpos = DEFAULT_XPOS;
+		ypos = DEFAULT_YPOS;
+	}
+	
+	public Monster(int x, int y, int s, int t, int i) {
+		//Monsters created with this constructor is not intended to be run. TODO Create MonsterSkel in Client-package instead?
+		xpos = x;
+		ypos = y;
+		speed = s;
+		turned = t;
+		id = i;
+		try {
+			url = new URL("http://utterfanskap.se/images/monster.png");
+		} catch (MalformedURLException e) {
+			System.out.println("Monster Sprite Fail in Monster-constructor");
+			e.printStackTrace();
+		}
+		sprite = new ImageIcon(url);
 	}
 	
 	public synchronized void printStats() {
@@ -57,6 +88,10 @@ public class Monster extends Sprite implements Runnable {
 		
 		while(alive) {
 			
+			activeSleep = 100;
+			move();
+			
+			/*
 			//Update state
 			update();
 			
@@ -77,7 +112,7 @@ public class Monster extends Sprite implements Runnable {
 				alive = false;
 				activeSleep = 0;
 			}
-			
+			*/
 			//Sleep a bit
 			try {
 				Thread.sleep(activeSleep);
@@ -95,8 +130,28 @@ public class Monster extends Sprite implements Runnable {
 	}
 
 	private void move() {
-		// TODO Auto-generated method stub
+		//temp hardcoded move.
+		if(xpos>=250) {
+			ypos = 101;
+		}
+		else if(xpos<=100) {
+			ypos = 100;
+		}
 		
+		if(xpos <= 250 && ypos == 100) {
+			xpos += 2;
+		}
+		else if(xpos>100 && ypos == 101) {
+			xpos -= 2;
+		}
+		
+		
+		//update coords
+		getCoords();
+		
+		//Send changes
+		MapSrv.monsterPositions.set(id, coords);
+		MapSrv.sendToAll(coords);
 	}
 
 	private void attack() {
@@ -105,7 +160,7 @@ public class Monster extends Sprite implements Runnable {
 	}
 
 	private void update() {
-		// TODO Auto-generated method stub
+		state = ATTACKING;
 		
 	}
 	
@@ -181,6 +236,10 @@ public class Monster extends Sprite implements Runnable {
 	
 	public synchronized boolean getAlive() {
 		return alive;
+	}
+	
+	public synchronized ImageIcon getImg() {
+		return sprite;
 	}
 	
 }
