@@ -9,7 +9,7 @@ public class Sprite {
 	URL url;
 	ImageIcon sprite;
 	protected int xpos = 100;
-	protected int ypos = 75;
+	protected int ypos = 100;
 	protected int turned = 1;
 	protected int speed = 5;
 	protected int id;
@@ -40,6 +40,22 @@ public class Sprite {
 				+ String.valueOf(id));
 	
 		return coords;
+	}
+	
+	public int getXpos() {
+		return this.xpos;
+	}
+	
+	public int getYpos() {
+		return this.ypos;
+	}
+	
+	public int getTurned() {
+		return this.turned;
+	}
+	
+	public int getSpeed() {
+		return this.speed;
 	}
 	
 }
