@@ -29,6 +29,9 @@ public class Zincgull extends JApplet implements MouseListener{
 		this.add(new Chat(), BorderLayout.SOUTH);
 		this.add(new GameArea(), BorderLayout.CENTER);
 		this.addMouseListener(this);
+		
+		//Initiate ImageBank
+		new ImageBank();
 	}
 	
 	public void paint(Graphics g) {

@@ -97,6 +97,20 @@ public class MapSrv extends Thread {
 		return 0;
 	}
 	
+	public static int getMonsterIndex(int id){
+		String[] temp;
+		if(!monsterPositions.isEmpty()) {
+		for (int i=0;i<monsterPositions.size(); i++) {
+			temp = monsterPositions.get(i).split(":");
+			if(temp[4].equals(Integer.toString(id))){	//needs to be unique
+				return i;
+			}
+		}
+		return 0;
+		}
+		return -1;
+	}
+	
 	public static String getTime(){
 		DateFormat time = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		Date date = new GregorianCalendar().getTime();
@@ -104,7 +118,7 @@ public class MapSrv extends Thread {
 	}
 
 	static public void setOutputStreams(Hashtable<Socket, DataOutputStream> outputStreams) {
-		outputStreams = outputStreams;
+		MapSrv.outputStreams = outputStreams;
 	}
 
 	static public Hashtable<Socket, DataOutputStream> getOutputStreams() {

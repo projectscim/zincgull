@@ -29,7 +29,6 @@ public class MonsterService extends Thread {
 	private static Logger log;
 	
 	private static Monster monster;
-	private static MapSrv mapSrv;
 	private static LinkedList<Monster> monsterList = new LinkedList<Monster>();
 	
 	public MonsterService(MapSrv mapSrv) {
@@ -37,7 +36,6 @@ public class MonsterService extends Thread {
 		BasicConfigurator.configure();
 		log.info("MonsterService created");
 		
-		MonsterService.mapSrv = mapSrv;
 		monsterLimit = 1;
 		chanceOfSurge = 5000; //one in .. every 'sleep'
 		chanceToEndSurge = 10; //one in .. every 'sleep'
@@ -55,6 +53,7 @@ public class MonsterService extends Thread {
 		//TODO Fail Safe - Checks
 		log.debug("Processing monster from DB");
 		
+		newMonster.setMonsterId(template.getMonsterId());
 		newMonster.setName(template.getName());
 		newMonster.setHealth(template.getHealth());
 		newMonster.setDamage(template.getDamage());
@@ -113,29 +112,30 @@ public class MonsterService extends Thread {
 	
 	private static void spawn() {
 		log.debug("Spawning new Monster");
+		int id;
 		
 		//Set up new Monster
-		//monster[monstersSpawned] = new Monster();
 		monster = new Monster();
 		processDbMonster(MonsterDatabase.getRandomMonster(), monster);
 		
 		//Set ID!!
-		monster.setId(monstersSpawned ); //starts from 0 until decent id-system is in place          (+1, monstersSpwaned havn't been up'd yet.)
+		id = monstersSpawned+1;
+		monster.setId(id); //+1, monstersSpwaned havn't been up'd yet. //TODO make sure +1 doesn't cause troubles.
 		
 		//Tell debug
 		log.debug("Spawned: \""+monster.getName()+"\" in: "+monster.getSpawnLocation()+" Id: "+monster.getId());
-		
-		//Add new monster to MapServer
-		addToMap(monster.getId(),monster.getXpos(),monster.getYpos(),monster.getTurned(),monster.getSpeed());
 		
 		//It's alive.
 		monster.setAlive(true);
 		
 		//Add to list
-		monsterList.add(monster); //atm, monsterId will be same as index. TODO A decent id-system.
+		monsterList.add(monster);
 		
 		//Start new Monster
-		monsterList.get((monster.getId())).thread.start();
+		monsterList.get(getMonsterIndex(id)).thread.start();
+		
+		//Add new monster to MapServer
+		addToMap(monster.getId(),monster.getXpos(),monster.getYpos(),monster.getTurned(), monster.getMonsterId(), monster.getHealth());
 		
 		//Count
 		monstersSpawned++;
@@ -144,16 +144,32 @@ public class MonsterService extends Thread {
 		log.debug("Monsters Alive: "+monsterCount);
 	}
 	
-	private static void addToMap(int id, int xpos, int ypos, int turned, int speed) {
+	private static int getMonsterIndex(int id) {
+		for (int i = 0; i < monsterList.size(); i++) {
+			if(monsterList.get(i).getId() == id) {	//needs to be unique
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	private static void addToMap(int id, int xpos, int ypos, int turned, int monsterId, int health) {
 		String spawnCoords;
 		
 		if(xpos == Monster.DEFAULT_XPOS  && ypos == Monster.DEFAULT_YPOS) {
 			//TODO Calculate and set spawn area.
 		}
 		
-		spawnCoords = String.valueOf(id)+":"+String.valueOf(xpos)+":"+String.valueOf(ypos)+":"+String.valueOf(turned)+":"+String.valueOf(speed);
+		//The order in which stuff are added to spawnCoords is VERY important.
+		//Most importantly, id is required to be added as the fifth element.
+		spawnCoords = String.valueOf(xpos)+":"
+						+String.valueOf(ypos)+":"
+						+String.valueOf(turned)+":"
+						+String.valueOf(monsterId)+":"
+						+String.valueOf(id)+":"
+						+String.valueOf(health);
 		
-		mapSrv.addMonster(id, spawnCoords);
+		MapSrv.addMonster(id, spawnCoords);
 	}
 
 	public static void dyingMonster(Monster deadMonster) {
@@ -167,6 +183,19 @@ public class MonsterService extends Thread {
 		if(statement) isSurge = true;
 		else isSurge = false;
 	}
+	
+	public static String getName(int id) {
+		
+		for (int i = 0; i < monsterList.size(); i++) {
+			if(monsterList.get(i).getId() == id) {
+				System.out.println("oliger");
+				return monsterList.get(i).getName();
+			}
+		}
+		
+		return null;
+	}
+	
 
 	public void run() {
 		while(true) {
