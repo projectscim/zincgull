@@ -8,13 +8,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
 
+import local.Database;
 import local.SecretDBinfo;
 
 /**
@@ -37,6 +37,7 @@ import local.SecretDBinfo;
 
  // TODO Possibility to backup monsterlists.
  // TODO Skip the loading of monsters and query the database instead.
+ // TODO Update local backup to use monsterId. 
 
 public class MonsterDatabase implements SecretDBinfo {
 	
@@ -71,41 +72,13 @@ public class MonsterDatabase implements SecretDBinfo {
 	
 	public MonsterDatabase() throws SQLException {
 		
-		connectMySQL();
+		conn = Database.connect();
 		
 		if(conn != null) {
 			loadMonsters();
 			conn.close();
 		}
 		else loadAllMonstersFromLocalDB();
-	}
-	
-	/**
-	 * Connects to MySQL-database.<br>
-	 * Sets {@link #conn} if successful.<br>
-	 * @see {@link #host}, {@link #user} and {@link #pass}
-	 */
-	private void connectMySQL() {
-		conn = null;
-		System.out.println("Connecting to MySQL-database..");
-		
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			conn = DriverManager.getConnection(url, user, pass);
-			System.out.println("Connection to MySQL-datbase established");
-		} catch (InstantiationException e) {
-			System.out.println("ERROR: InstantiationException\n" +
-					"ERROR: Connection FAILED");
-		} catch (IllegalAccessException e) {
-			System.out.println("ERROR: IllegalAccessException\n" +
-					"ERROR: Connection FAILED");
-		} catch (ClassNotFoundException e) {
-			System.out.println("ERROR: ClassNotFoundException\n" +
-					"ERROR: Connection FAILED");
-		} catch (SQLException e) {
-			System.out.println("ERROR: SQLException\n" +
-					"ERROR: Connection FAILED");
-		}
 	}
 	
 	/**
@@ -121,6 +94,7 @@ public class MonsterDatabase implements SecretDBinfo {
 		while(rs.next()) {
 			monster = new Monster();
 			
+			monster.setMonsterId(rs.getInt("id"));
 			monster.setName(rs.getString("name"));
 			monster.setHealth(rs.getInt("health"));
 			monster.setDamage(rs.getInt("damage"));

@@ -21,12 +21,14 @@ public class Monster extends Sprite implements Runnable {
 	private int activeSleep = 50;
 	private static final int range = 5;
 
-	public static final int DEFAULT_XPOS = 100;
-	public static final int DEFAULT_YPOS = 100;
+	public static final int DEFAULT_XPOS = 300;
+	public static final int DEFAULT_YPOS = 300;
 	
 	private int id;
+	private int index;
 	
 	//Stats
+	private int monsterId;
 	private String name;
 	private int damage;
 	private int health;
@@ -59,8 +61,15 @@ public class Monster extends Sprite implements Runnable {
 		speed = s;
 		turned = t;
 		id = i;
+		
+		name = MonsterService.getName(id);
+		
+		System.out.println("name: "+name);
+		
 		try {
-			url = new URL("http://utterfanskap.se/images/monster.png");
+			String u = "http://utterfanskap.se/zincResources/images/monsters/"+((name.toLowerCase()).replace(' ', '_'))+".png";
+			System.out.println(u);
+			url = new URL(u);
 		} catch (MalformedURLException e) {
 			System.out.println("Monster Sprite Fail in Monster-constructor");
 			e.printStackTrace();
@@ -80,6 +89,18 @@ public class Monster extends Sprite implements Runnable {
 		System.out.println("Spawn: "+spawnLocation);
 		System.out.println("Boss: "+boss);
 		System.out.println("--------------");
+	}
+	
+	//Override Sprite
+	public String getCoords() {
+		coords = (String.valueOf(xpos)+":"
+				+ String.valueOf(ypos)+":"
+				+ String.valueOf(turned)+":"
+				+ String.valueOf(monsterId)+":"
+				+ String.valueOf(id)+":"
+				+ String.valueOf(health));
+	
+		return coords;
 	}
 
 	public synchronized void run() {
@@ -131,17 +152,17 @@ public class Monster extends Sprite implements Runnable {
 
 	private void move() {
 		//temp hardcoded move.
-		if(xpos>=250) {
-			ypos = 101;
+		if(xpos>=350) {
+			ypos = 301;
 		}
-		else if(xpos<=100) {
-			ypos = 100;
+		else if(xpos<=300) {
+			ypos = 300;
 		}
 		
-		if(xpos <= 250 && ypos == 100) {
+		if(xpos <= 450 && ypos == 300) {
 			xpos += 2;
 		}
-		else if(xpos>100 && ypos == 101) {
+		else if(xpos>300 && ypos == 301) {
 			xpos -= 2;
 		}
 		
@@ -150,7 +171,8 @@ public class Monster extends Sprite implements Runnable {
 		getCoords();
 		
 		//Send changes
-		MapSrv.monsterPositions.set(id, coords);
+		index = MapSrv.getMonsterIndex(id);
+		MapSrv.monsterPositions.set(index, coords);
 		MapSrv.sendToAll(coords);
 	}
 
@@ -172,6 +194,14 @@ public class Monster extends Sprite implements Runnable {
 	
 	public synchronized void setId(int id) {
 		this.id = id;
+	}
+	
+	public synchronized int getMonsterId() {
+		return monsterId;
+	}
+	
+	public synchronized void setMonsterId(int id) {
+		this.monsterId = id;
 	}
 	
 	public synchronized String getName() {
@@ -240,6 +270,14 @@ public class Monster extends Sprite implements Runnable {
 	
 	public synchronized ImageIcon getImg() {
 		return sprite;
+	}
+	
+	public synchronized int getImgWidth() {
+		return sprite.getIconWidth();
+	}
+	
+	public synchronized int getImgHeight() {
+		return sprite.getIconHeight();
 	}
 	
 }

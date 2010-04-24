@@ -8,14 +8,7 @@ import java.util.LinkedList;
 
 import javax.swing.*;
 
-import server.Monster;
-
 public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable{
-	
-	//TEMP
-	private URL url;
-	public static ImageIcon monsterImg;
-	
 	
 	private static final long serialVersionUID = -5572295459928673608L;
 	
@@ -23,19 +16,13 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private DataOutputStream dos;
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
-	private Timer tim = new Timer(10,this);
+	private Timer tim = new Timer(20,this);
 	boolean[] arrowDown = new boolean[4];
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
-	protected static LinkedList<Monster> monster = new LinkedList<Monster>();
+	protected static LinkedList<MonsterEcho> monster = new LinkedList<MonsterEcho>();
 	
 	public GameArea() {
-		
-		//TEMP!
-		try {
-			url = new URL("http://utterfanskap.se/images/monster.png");
-		} catch (MalformedURLException e) {}
-		monsterImg = new ImageIcon(url);
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
@@ -54,9 +41,17 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			}
 		}
 		
-		for (int i = 0; i < monster.size(); i++) {
-			Monster m = monster.get(i);
-			g.drawImage(m.getImg().getImage(), m.xpos-m.turned*(100/2), m.ypos, 100, 150, null);
+		for (int i=0;i<monster.size();i++) {
+			
+			MonsterEcho m = monster.get(i);
+			ImageIcon img = ImageBank.getImage(m.getMonsterId());
+			
+			g.drawImage(img.getImage(), 
+					m.getXpos()-m.getTurned()*(img.getIconWidth()/2),
+					m.getYpos(), 
+					img.getIconWidth(),
+					img.getIconHeight(),
+					null);
 		}
 		
 		if(Zincgull.isMouseActive()){
@@ -68,12 +63,14 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	public void run() {
 		try {
 			while (true) {
+				
 				String coords = dis.readUTF();
 				if (!specialCommand(coords)) {
+					
 					String[] temp;
 					temp = coords.split(":");
 					
-					if(Double.valueOf(temp[4])<1 && Double.valueOf(temp[4])!=0) { //if player
+					if(Double.valueOf(temp[4])<1) { //if player
 						Player ps = player.get(getId(Double.valueOf(temp[4])));
 						if( !temp[4].equals( Double.toString(Zincgull.random) ) ){		//only paint new coordinates if they didnt come from this client
 							ps.xpos = Integer.parseInt(temp[0]);
@@ -83,24 +80,29 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 							repaint();
 						}	
 					}
-					else if((getMonster(temp[4]))==-1) {
-						int x = Integer.parseInt(temp[0]);
-						int y = Integer.parseInt(temp[1]);
-						int s = Integer.parseInt(temp[2]);
-						int t = Integer.parseInt(temp[3]);
-						int i = Integer.parseInt(temp[4]);
+					else if((getMonster(temp[4]))==-1) { //Since not player, if monster not already added
+						System.out.println("add monster");
+						int x = Integer.parseInt(temp[0]);	//X-pos
+						int y = Integer.parseInt(temp[1]);	//Y-pos
+						int t = Integer.parseInt(temp[2]);	//turned (1/0)
+						int mi = Integer.parseInt(temp[3]);	//MonsterType-id, NOT UNIQUE
+						int i = Integer.parseInt(temp[4]);	//id, UNIQUE
+						int h = Integer.parseInt(temp[5]);	//health, the current health of the monster
 						
-						monster.add(new Monster(x,y,t,s,i));
+						monster.add(new MonsterEcho(x,y,t,i,mi,h));
 						
 						repaint();
 					}
-					else {
-						Monster m = monster.get(getMonster(temp[4]));
+					else { //not player and already added, update the MonsterEcho-object.
+						MonsterEcho m = monster.get(getMonster(temp[4]));
 						
-						m.xpos = Integer.parseInt(temp[0]);
-						m.ypos = Integer.parseInt(temp[1]);
-						m.turned = Integer.parseInt(temp[2]);
-						m.speed = Integer.parseInt(temp[3]);
+						m.setXpos(Integer.parseInt(temp[0]));
+						m.setYpos(Integer.parseInt(temp[1]));
+						m.setTurned(Integer.parseInt(temp[2]));
+						//m.setMonsterId(Integer.parseInt(temp[3])); 	No need, it will never change
+						//m.setId(Integer.parseInt(temp[4])); 			No need, it will never change
+						m.setHealth(Integer.parseInt(temp[5]));
+						
 						repaint();
 					}
 					
