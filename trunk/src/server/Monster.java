@@ -22,7 +22,7 @@ public class Monster extends Sprite implements Runnable {
 	private static final int range = 5;
 
 	public static final int DEFAULT_XPOS = 300;
-	public static final int DEFAULT_YPOS = 300;
+	public static final int DEFAULT_YPOS = 320;
 	
 	private int id;
 	private int index;

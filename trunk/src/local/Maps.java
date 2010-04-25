@@ -1,4 +1,4 @@
-package server;
+package local;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Maps {
 
 	private static BufferedReader bf;
-	private static final String path = "maps/";
+	private static final String path = "../maps/";
 	private static final String sgmnt1 = "1-1.txt";
 	private static ArrayList<String> tiles = new ArrayList<String>();
 	
@@ -54,7 +54,7 @@ public class Maps {
 		return 0;
 	}
 	
-	public static ArrayList<String> getMapSegment(String asdf) {
+	public static ArrayList<String> getMapSegment() {
 		return tiles;
 	}
 	
