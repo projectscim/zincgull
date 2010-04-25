@@ -42,6 +42,8 @@ public class Monster extends Sprite implements Runnable {
 	private static final int DEAD = -1;
 	private static final int WAITING = 0;
 	private static final int ATTACKING = 1;
+	private static final int MOVING_RIGHT = 2;
+	private static final int MOVING_LEFT = 3;
 	
 	private boolean alive;
 	
@@ -103,7 +105,7 @@ public class Monster extends Sprite implements Runnable {
 		return coords;
 	}
 
-	public synchronized void run() {
+	public void run() {
 		
 		alive = true;
 		
@@ -152,19 +154,24 @@ public class Monster extends Sprite implements Runnable {
 
 	private void move() {
 		//temp hardcoded move.
-		if(xpos>=350) {
-			ypos = 301;
+		if ((state != MOVING_RIGHT) && (state != MOVING_LEFT)) state = MOVING_LEFT;
+		
+		if(xpos>=850 && state!=MOVING_LEFT) {
+			state = MOVING_LEFT;
 		}
-		else if(xpos<=300) {
-			ypos = 300;
+		else if(xpos<=100 && state!=MOVING_RIGHT) {
+			state = MOVING_RIGHT;
 		}
 		
-		if(xpos <= 450 && ypos == 300) {
-			xpos += 2;
+		if (state == MOVING_LEFT) {
+			xpos-=2;
+			turned = 1;
 		}
-		else if(xpos>300 && ypos == 301) {
-			xpos -= 2;
+		else if(state == MOVING_RIGHT) {
+			xpos+=2;
+			turned = -1;
 		}
+		
 		
 		
 		//update coords
@@ -188,95 +195,95 @@ public class Monster extends Sprite implements Runnable {
 	
 	
 	//a Shitload of getters/setters
-	public synchronized int getId() {
+	public int getId() {
 		return id;
 	}
 	
-	public synchronized void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	
-	public synchronized int getMonsterId() {
+	public int getMonsterId() {
 		return monsterId;
 	}
 	
-	public synchronized void setMonsterId(int id) {
+	public void setMonsterId(int id) {
 		this.monsterId = id;
 	}
 	
-	public synchronized String getName() {
+	public String getName() {
 		return name;
 	}
 
-	public synchronized void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	public synchronized int getDamage() {
+	public int getDamage() {
 		return damage;
 	}
 
-	public synchronized void setDamage(int damage) {
+	public void setDamage(int damage) {
 		this.damage = damage;
 	}
 
-	public synchronized int getHealth() {
+	public int getHealth() {
 		return health;
 	}
 
-	public synchronized void setHealth(int health) {
+	public void setHealth(int health) {
 		this.health = health;
 	}
 
-	public synchronized int getLevel() {
+	public int getLevel() {
 		return level;
 	}
 
-	public synchronized void setLevel(int level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
 
-	public synchronized int getAggro() {
+	public int getAggro() {
 		return aggro;
 	}
 
-	public synchronized void setAggro(int aggro) {
+	public void setAggro(int aggro) {
 		this.aggro = aggro;
 	}
 
-	public synchronized String getSpawnLocation() {
+	public String getSpawnLocation() {
 		return spawnLocation;
 	}
 
-	public synchronized void setSpawnLocation(String spawnLocation) {
+	public void setSpawnLocation(String spawnLocation) {
 		this.spawnLocation = spawnLocation;
 	}
 
-	public synchronized boolean isBoss() {
+	public boolean isBoss() {
 		return boss;
 	}
 
-	public synchronized void setBoss(boolean boss) {
+	public void setBoss(boolean boss) {
 		this.boss = boss;
 	}
 	
-	public synchronized void setAlive(boolean alive) {
+	public void setAlive(boolean alive) {
 		this.alive = alive;
 	}
 	
-	public synchronized boolean getAlive() {
+	public boolean getAlive() {
 		return alive;
 	}
 	
-	public synchronized ImageIcon getImg() {
+	public ImageIcon getImg() {
 		return sprite;
 	}
 	
-	public synchronized int getImgWidth() {
+	public int getImgWidth() {
 		return sprite.getIconWidth();
 	}
 	
-	public synchronized int getImgHeight() {
+	public int getImgHeight() {
 		return sprite.getIconHeight();
 	}
 	

@@ -49,7 +49,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			g.drawImage(img.getImage(), 
 					m.getXpos()-m.getTurned()*(img.getIconWidth()/2),
 					m.getYpos(), 
-					img.getIconWidth(),
+					img.getIconWidth()*monster.get(i).getTurned(),
 					img.getIconHeight(),
 					null);
 		}

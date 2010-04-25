@@ -46,8 +46,16 @@ public class Sprite {
 		return this.xpos;
 	}
 	
+	public void setXpos(int i) {
+		this.xpos = i;
+	}
+	
 	public int getYpos() {
 		return this.ypos;
+	}
+	
+	public void setYpos(int i) {
+		this.ypos = i;
 	}
 	
 	public int getTurned() {
