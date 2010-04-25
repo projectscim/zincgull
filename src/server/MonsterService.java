@@ -151,9 +151,9 @@ public class MonsterService extends Thread {
 	
 	private static int getMonsterIndex(int id) {
 		for (int i = 0; i < monsterList.size(); i++) {
-			if(monsterList.get(i).getId() == id) {	//needs to be unique
-				return i;
-			}
+            if(monsterList.get(i).getId() == id) {  //needs to be unique
+                    return i;
+            }
 		}
 		return -1;
 	}
@@ -182,6 +182,9 @@ public class MonsterService extends Thread {
 		
 		monsterCount--;
 		log.debug("MonsterCount is now: "+monsterCount);
+		
+		//Remove monster from monsterList.
+		monsterList.remove(getMonsterIndex(deadMonster.getId()));
 	}
 	
 	public static void setIsSurge(boolean statement) {
@@ -202,7 +205,7 @@ public class MonsterService extends Thread {
 	}
 	
 
-	public void run() {
+	public synchronized void run() {
 		while(true) {
 			//Slight chance of Monster Surge starting
 			//Significant chance of Monster Surge ending
