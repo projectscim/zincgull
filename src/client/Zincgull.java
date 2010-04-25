@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,10 +26,12 @@ public class Zincgull extends JApplet implements MouseListener{
 	public void init() {	
 		host = getParameter("host");
 		nick = getParameter("nick");
-		this.add(new Sidebar(), BorderLayout.EAST);
+		//this.add(new Sidebar(), BorderLayout.EAST);
 		this.add(new Chat(), BorderLayout.SOUTH);
 		this.add(new GameArea(), BorderLayout.CENTER);
 		this.addMouseListener(this);
+		setPreferredSize(new Dimension(750,750));
+		this.resize(750, 750);
 		
 		//Initiate ImageBank
 		new ImageBank();
