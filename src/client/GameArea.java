@@ -4,9 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.*;
+
+import local.Maps;
 
 public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable{
 	
@@ -18,6 +21,12 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private int port = 49051;	//mapserver-port
 	private Timer tim = new Timer(20,this);
 	boolean[] arrowDown = new boolean[4];
+	boolean readMap = false;
+	
+	private ArrayList<String> tiles = new ArrayList<String>();
+	private ImageIcon groundTile = new ImageIcon("../images/tiles/ground.png");
+	private ImageIcon playerImg = new ImageIcon("../images/players/player.png");
+	private static final int TILE_SIZE = 32;
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	protected static LinkedList<MonsterEcho> monster = new LinkedList<MonsterEcho>();
@@ -34,10 +43,20 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		for (int i=0;i<tiles.size();i++) {
+			for (int j=0;j < (tiles.get(i).length());j++) {
+				switch(tiles.get(j).charAt(j)) {
+				case 'G':
+					g.drawImage(groundTile.getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				}
+			}	
+		}
+		
 		for (int i = 0; i < player.size(); i++) {
 			if(player.get(i).id != 0.0){
 				Player p = player.get(i);
-				g.drawImage(p.sprite.getImage(), p.xpos-p.turned*(100/2), p.ypos, p.turned*100, 50, null);
+				g.drawImage(playerImg.getImage(), p.xpos-p.turned*(playerImg.getIconWidth()/2), p.ypos, p.turned*playerImg.getIconWidth(), playerImg.getIconHeight(), null);
 			}
 		}
 		
@@ -61,6 +80,18 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	//keep receiving messages from the server
 	public void run() {
+		
+		if(!readMap) {
+			new local.Maps();
+			
+			for(int i=0;i<Maps.getMapSegment().size();i++) {
+				tiles.add(Maps.getMapSegment().get(i));
+			}
+			
+			repaint();
+			readMap = true;
+		}
+		
 		try {
 			while (true) {
 				

@@ -130,7 +130,7 @@ public class MonsterService extends Thread {
 		
 		if(monstersSpawned==1) {
 			monster.setXpos(100);
-			monster.setYpos(500);
+			monster.setYpos(416);
 		}
 		
 		//Add to list
