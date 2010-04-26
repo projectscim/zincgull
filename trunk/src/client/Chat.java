@@ -66,6 +66,7 @@ public class Chat extends JPanel implements Runnable {
 	
 	public void connectServer(boolean first){
 		boolean reconnect = true;
+		long sleep = 5000;
 		while (reconnect) {
 			try {
 				socket = new Socket(Zincgull.host, port);
@@ -78,10 +79,11 @@ public class Chat extends JPanel implements Runnable {
 				reconnect = false;
 				if(!first) chatOutput.append(Zincgull.getTime()+": CHAT: Connected to server\n");
 			} catch( IOException e ) { 
-				if(first){
-					chatOutput.append(Zincgull.getTime()+": CHAT: Can't connect to server, trying again\n");
-					first = false;
-				}
+				chatOutput.append(Zincgull.getTime()+": CHAT: Can't connect to server, trying again in: "+(sleep/1000)+" s \n");
+				//Sleep a bit
+				try {
+					Thread.sleep(sleep);
+				} catch (InterruptedException e1) {}
 			}
 		}
 	}
