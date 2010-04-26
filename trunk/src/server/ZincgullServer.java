@@ -3,8 +3,8 @@ package server;
 import java.sql.SQLException;
 
 public class ZincgullServer {
-	
-	private static MonsterDatabase MD;
+
+	//private static MonsterDatabase MD;
 	private static MonsterService MS;
 	private static MapSrv MapS;
 	private static ChatSrv CS;
@@ -14,7 +14,7 @@ public class ZincgullServer {
 	
 	public static void main(String[] args) throws SQLException, InterruptedException {
 		System.out.println("Starting MonsterDatabase");
-		MD = new MonsterDatabase();
+		new MonsterDatabase();
 		Thread.sleep(5000);
 		
 		System.out.println("Starting ChatServer");

@@ -3,21 +3,21 @@ import java.io.*;
 import java.net.*;
 
 public class MapSrvThread extends Thread {
-	private MapSrv server;
+	//private MapSrv server;
 	private Socket socket;
 	private Double user;
 	private Monster monster;
 	private boolean isMonster; //TODO Remove? Remove monsterRun? Don't forget stuff in specialCommand!
 
 	public MapSrvThread( MapSrv server, Socket socket ) {
-		this.server = server;
+		//this.server = server;
 		this.socket = socket;
 		isMonster = false;
 		start();
 	}
 	
 	public MapSrvThread(MapSrv server, Monster monster) {
-		this.server = server;
+		//this.server = server;
 		this.monster = monster; 
 		isMonster = true;
 		start();
@@ -38,14 +38,14 @@ public class MapSrvThread extends Thread {
 					temp = coords.split(":");
 					user = Double.parseDouble(temp[4]);
 					MapSrv.positions.set(MapSrv.getId(user), coords);
-					server.sendToAll( coords );
+					MapSrv.sendToAll( coords );
 					System.out.println( "MAP "+MapSrv.getTime()+": COORDS: "+coords );
 				}
 			}
 		} catch( EOFException ie ) {		//no failmsg
 		} catch( IOException ie ) {
 		} finally {
-			server.removeConnection( socket, user );	//closing socket when connection is lost
+			MapSrv.removeConnection( socket, user );	//closing socket when connection is lost
 		}
 	}
 	
@@ -61,7 +61,7 @@ public class MapSrvThread extends Thread {
 			
 			if(first) specialCommand("/HELLO"+coords);
 			
-			server.sendToAll(coords);
+			MapSrv.sendToAll(coords);
 			first = false;
 			try {
 				Thread.sleep(200);
@@ -98,7 +98,7 @@ public class MapSrvThread extends Thread {
 				MapSrv.monsterPositions.add(msg);
 			}
 			
-			server.sendToAll("/ADD "+msg);
+			MapSrv.sendToAll("/ADD "+msg);
 			return true;
 		}
 		return false;

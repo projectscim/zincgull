@@ -17,9 +17,9 @@ public class Monster extends Sprite implements Runnable {
 	
 	Thread thread = new Thread(this);
 	
-	private static final int idleSleep = 2000;
+	//private static final int idleSleep = 2000;
 	private int activeSleep = 50;
-	private static final int range = 5;
+	//private static final int range = 5;
 
 	public static final int DEFAULT_XPOS = 300;
 	public static final int DEFAULT_YPOS = 320;
@@ -39,9 +39,9 @@ public class Monster extends Sprite implements Runnable {
 	
 	//Active
 	private int state;
-	private static final int DEAD = -1;
-	private static final int WAITING = 0;
-	private static final int ATTACKING = 1;
+	//private static final int DEAD = -1;
+	//private static final int WAITING = 0;
+	//private static final int ATTACKING = 1;
 	private static final int MOVING_RIGHT = 2;
 	private static final int MOVING_LEFT = 3;
 	
@@ -147,10 +147,10 @@ public class Monster extends Sprite implements Runnable {
 		
 	}
 	
-	private void checkRange() {
-		// TODO Auto-generated method stub
-		
-	}
+//	private void checkRange() {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 	private void move() {
 		//temp hardcoded move.
@@ -183,15 +183,15 @@ public class Monster extends Sprite implements Runnable {
 		MapSrv.sendToAll(coords);
 	}
 
-	private void attack() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void update() {
-		state = ATTACKING;
-		
-	}
+//	private void attack() {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	private void update() {
+//		state = ATTACKING;
+//		
+//	}
 	
 	
 	//a Shitload of getters/setters
