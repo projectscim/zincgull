@@ -26,15 +26,21 @@ public class Zincgull extends JApplet implements MouseListener{
 	public void init() {	
 		host = getParameter("host");
 		nick = getParameter("nick");
-		//this.add(new Sidebar(), BorderLayout.EAST);
-		this.add(new Chat(), BorderLayout.SOUTH);
-		this.add(new GameArea(), BorderLayout.CENTER);
-		this.addMouseListener(this);
+		final int id = Integer.valueOf(getParameter("id"));
+		
+		//set size
 		setPreferredSize(new Dimension(736,736));
 		this.resize(736, 736);
 		
+		this.add(new Chat(), BorderLayout.SOUTH);
+		this.add(new GameArea(id), BorderLayout.CENTER);
+		this.addMouseListener(this);
+		
 		//Initiate ImageBank
 		new ImageBank();
+		
+		
+		//this.add(new Sidebar(), BorderLayout.EAST);
 	}
 	
 	public void paint(Graphics g) {

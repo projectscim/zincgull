@@ -21,6 +21,7 @@ public class MonsterService extends Thread {
 	//private static int monstersDesert;
 	//private static int monstersForest;
 	
+	private static final int idOffset = 1000; //Start monsterIds from 1000.
 	private static int monsterLimit;
 	private static boolean isSurge;
 	private static int chanceOfSurge; //one in ..
@@ -119,8 +120,8 @@ public class MonsterService extends Thread {
 		processDbMonster(MonsterDatabase.getRandomMonster(), monster);
 		
 		//Set ID!!
-		id = monstersSpawned+1;
-		monster.setId(id); //+1, monstersSpwaned havn't been up'd yet. //TODO make sure +1 doesn't cause troubles.
+		id = monstersSpawned+idOffset;
+		monster.setId(id);
 		
 		//Tell debug
 		log.debug("Spawned: \""+monster.getName()+"\" in: "+monster.getSpawnLocation()+" Id: "+monster.getId());

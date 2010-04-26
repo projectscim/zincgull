@@ -1,36 +1,18 @@
 package client;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.swing.ImageIcon;
 
 public class Sprite {
-	URL url;
-	ImageIcon sprite;
-	protected int xpos = 100;
-	protected int ypos = 100;
-	protected int turned = 1;
-	protected int speed = 5;
+	protected int xpos;
+	protected int ypos;
+	protected int turned;
+	protected int speed;
 	protected int id;
+	protected int xMap;
+	protected int yMap;
 	protected String coords;
 	
-	public Sprite() {
-		
-	}
-	
-	public Sprite(int x, int y, int s, int i) {
-		try {
-			url = new URL( "http://zincgull.rodstrom.se/zincgull.png" );
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-		sprite = new ImageIcon(url);
-		this.xpos = x;
-		this.ypos = y;
-		this.id = i;
-	}
+	public static final int NOT_TURNED = 1;
+	public static final int TURNED = -1;
 	
 	public String getCoords() {
 		coords = (String.valueOf(xpos)+":"
@@ -62,8 +44,16 @@ public class Sprite {
 		return this.turned;
 	}
 	
+	public void setTurned(int i) {
+		this.turned = i;
+	}
+	
 	public int getSpeed() {
 		return this.speed;
+	}
+	
+	public void setSpeed(int s) {
+		this.speed = s;
 	}
 	
 }
