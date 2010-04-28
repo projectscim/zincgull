@@ -12,9 +12,9 @@ import java.util.LinkedList;
 import javax.swing.*;
 
 import local.Database;
-import local.Maps;
+import local.GlobalConstants;
 
-public class GameArea extends JPanel implements KeyListener, Runnable{
+public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable, GlobalConstants{
 	
 	private static final long serialVersionUID = -5572295459928673608L;
 	private static int myId;
@@ -23,23 +23,36 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 	private DataOutputStream dos;
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
-	//private Timer tim = new Timer(20,this);
-	private Thread thread;
+	private Timer tim = new Timer(20,this);
 	boolean[] arrowDown = new boolean[4];
 	boolean readMap = false;
 	private final static int monsterIdStart = 1000;
 	
 	private ArrayList<String> tiles = new ArrayList<String>();
-	private ImageIcon groundTile = new ImageIcon("../images/tiles/ground.png");
+	private ImageIcon[] groundTile = {new ImageIcon("../images/tiles/ground.png"),
+										new ImageIcon("../images/tiles/topStop.png"),
+										new ImageIcon("../images/tiles/leftStop.png"),
+										new ImageIcon("../images/tiles/rightStop.png"),
+										new ImageIcon("../images/tiles/bottomStop.png"),
+										new ImageIcon("../images/tiles/leftTopCorner.png"),
+										new ImageIcon("../images/tiles/rightTopCorner.png"),
+										new ImageIcon("../images/tiles/leftBottomCorner.png"),
+										new ImageIcon("../images/tiles/rightBottomCorner.png"),
+										new ImageIcon("../images/tiles/exit.png"),
+										new ImageIcon("../images/tiles/highGround.png"),
+										new ImageIcon("../images/tiles/invLeftTopCorner.png"),
+										new ImageIcon("../images/tiles/invRightTopCorner.png"),
+										new ImageIcon("../images/tiles/invLeftBottomCorner.png"),
+										new ImageIcon("../images/tiles/invRightBottomCorner.png")};
+	
 	private ImageIcon[] playerImg = {new ImageIcon("../images/players/player.png"),
 									new ImageIcon("../images/players/otherPlayer.png")};
-	private static final int TILE_SIZE = 32;
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	protected static LinkedList<MonsterEcho> monster = new LinkedList<MonsterEcho>();
 	
 	Connection conn = null;
-	private static final long sleep = 10;
+	private static final long sleep = 5;
 	
 	public GameArea(int id) {
 		myId = id;
@@ -48,28 +61,84 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
       	this.setBackground(Color.WHITE);
       	this.setDoubleBuffered(true);
       	
-      	//tim.addActionListener(this);
-		//tim.start();
+      	tim.addActionListener(this);
+		tim.start();
 		connect(true, "80:50:1:1");	//try to connect, "true" because its the first time
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		int imgInt;
 		for (int i=0;i<tiles.size();i++) {
 			for (int j=0;j < (tiles.get(i).length());j++) {
 				switch(tiles.get(i).charAt(j)) {
-				case 'G':
-					g.drawImage(groundTile.getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+				case ' ':
+					imgInt = 0;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
 					break;
-				case 'S':
-					//asdf
+				case 'T':
+					imgInt = 1;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'L':
+					imgInt = 2;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'R':
+					imgInt = 3;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'Q':
+					imgInt = 4;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'C':
+					imgInt = 5;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'V':
+					imgInt = 6;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'B':
+					imgInt = 7;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'N':
+					imgInt = 8;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'E':
+					imgInt = 9;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'H':
+					imgInt = 10;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'I':
+					imgInt = 11;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'O':
+					imgInt = 12;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'P':
+					imgInt = 13;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
+				case 'U':
+					imgInt = 14;
+					g.drawImage(groundTile[imgInt].getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
+					break;
 				default:
-					//asdf
+					System.out.println("map failure");
 				}
 			}	
 		}
 		
-		int imgInt;
+		imgInt = 0;
 		for (int i = 0; i < player.size(); i++) {
 			if(player.get(i).getId() != 0.0){
 				Player p = player.get(i);
@@ -94,6 +163,8 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 					img.getIconWidth()*monster.get(i).getTurned(),
 					img.getIconHeight(),
 					null);
+			
+			System.out.println("Painted: "+m.getName()+" @: "+m.getXpos()+"x "+m.getYpos()+"y");
 		}
 		
 		if(Zincgull.isMouseActive()){
@@ -104,12 +175,12 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 	//keep receiving messages from the server
 	public void run() {
 		
-		while(true) {
+		
 			if(!readMap) {
-				new local.Maps();
+				new client.LoadMap();
 				
-				for(int i=0;i<Maps.getMapSegment().size();i++) {
-					tiles.add(Maps.getMapSegment().get(i));
+				for(int i=0;i<LoadMap.getMapSegment().size();i++) {
+					tiles.add(LoadMap.getMapSegment().get(i));
 				}
 				
 				repaint();
@@ -152,6 +223,9 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 							repaint();
 						}
 						else { //not player and already added, update the MonsterEcho-object.
+							
+							System.out.println("WHY CANT I SEE THIS!! =(");
+							
 							MonsterEcho m = monster.get(getMonster(temp[4]));
 							
 							m.setXpos(Integer.parseInt(temp[0]));
@@ -165,10 +239,7 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 						}
 						
 					}
-					//No need to over-do it
-					try {
-						Thread.sleep(sleep);
-					} catch (InterruptedException e) {}
+					
 				}
 			} catch( IOException ie ) {
 				
@@ -188,7 +259,7 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 				connect(false, x+":"+y+":"+t+":"+s);
 				return;
 			}
-		}
+		
 	}
 
 	private int getMonster(String sid) {
@@ -219,8 +290,8 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 				dos = new DataOutputStream( socket.getOutputStream() );
 				dos.writeUTF("/HELLO "+position+":"+myId);
 				// Start a background thread for receiving coordinates
-				//new Thread( this ).start();		//starts run()-method
-				new Thread(this).start();
+				new Thread( this ).start();		//starts run()-method
+				
 				if(!first) Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connected to mapserver\n");
 				return;
 			} catch( IOException e ) { 
@@ -247,21 +318,19 @@ public class GameArea extends JPanel implements KeyListener, Runnable{
 	}
 	
 	public void keyPressed(KeyEvent e) {
-		lol();
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40){
 			arrowDown[40-e.getKeyCode()]=true;
 		}
 	}
 	
 	public void keyReleased(KeyEvent e) {
-		lol();
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40)
 			arrowDown[40-e.getKeyCode()]=false;
 	}
 
 	public void keyTyped(KeyEvent e) {}
 
-	public void lol() {
+	public void actionPerformed(ActionEvent arg0) {
 		if ( Zincgull.connected ) {
 			if (Zincgull.isMouseActive()&&(arrowDown[0]||arrowDown[1]||arrowDown[2]||arrowDown[3])) {
 				calculateMove();

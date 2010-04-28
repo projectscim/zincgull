@@ -1,4 +1,4 @@
-package local;
+package server;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,14 +8,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class Maps {
+public class LoadMaps {
 
 	private static BufferedReader bf;
-	private static final String path = "../maps/";
+	private static final String path = "maps/";
 	private static final String sgmnt1 = "1-1.dat";
 	private static ArrayList<String> tiles = new ArrayList<String>();
 	
-	public Maps() {
+	public LoadMaps() {
 		loadMap(sgmnt1);
 	}
 	
@@ -59,7 +59,10 @@ public class Maps {
 	}
 	
 	public static void main(String[] args) {
-		new Maps();
+		new LoadMaps();
 	}
 	
+	public static char getTile(int x, int y) {
+		return (tiles.get(y).charAt(x));
+	}
 }

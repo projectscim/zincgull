@@ -2,9 +2,13 @@ package server;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 
+import local.GlobalConstants;
+
+import client.LoadMap;
 import client.Sprite;
 
 /**
@@ -13,7 +17,7 @@ import client.Sprite;
  * 
  * @author Andreas
  */
-public class Monster extends Sprite implements Runnable {
+public class Monster extends Sprite implements Runnable, GlobalConstants{
 	
 	Thread thread = new Thread(this);
 	
@@ -42,41 +46,92 @@ public class Monster extends Sprite implements Runnable {
 	//private static final int DEAD = -1;
 	//private static final int WAITING = 0;
 	//private static final int ATTACKING = 1;
+	private static final int MOVING = 2;
+
 	private static final int MOVING_RIGHT = 2;
 	private static final int MOVING_LEFT = 3;
 	
-	private boolean alive;
+	private static double dx;
+	private static double dy;
 	
-	private URL url;
-	private ImageIcon sprite;
+	private boolean alive;
 	
 	public Monster() {
 		id = 0;
 		xpos = DEFAULT_XPOS;
 		ypos = DEFAULT_YPOS;
+		
+		speed = 5;
 	}
 	
-	public Monster(int x, int y, int s, int t, int i) {
-		//Monsters created with this constructor is not intended to be run. TODO Create MonsterSkel in Client-package instead?
-		xpos = x;
-		ypos = y;
-		speed = s;
-		turned = t;
-		id = i;
+	private void randomDirection() {
+		//Randomize movement direction
+		Random randomize = new Random();
+		int angle = randomize.nextInt(361);
 		
-		name = MonsterService.getName(id);
+		System.out.println("RANDOM ANGLE: "+angle);
 		
-		System.out.println("name: "+name);
+		setDirection(angle);
+	}
+	
+	private void setDirection(double angle) {
+		//if not valid angle
+		if(angle<0 || angle>360) return;
 		
-		try {
-			String u = "http://utterfanskap.se/zincResources/images/monsters/"+((name.toLowerCase()).replace(' ', '_'))+".png";
-			System.out.println(u);
-			url = new URL(u);
-		} catch (MalformedURLException e) {
-			System.out.println("Monster Sprite Fail in Monster-constructor");
-			e.printStackTrace();
+		double speed = (double)(this.speed);
+		
+		if(angle<=90) {
+			
+			if(((angle/90)) <= 0.5) {
+				dy = ((angle/90)*speed);
+				dx = ((1-(angle/90))*speed);
+			}
+			else {
+				dy = ((1-(angle/90))*speed);
+				dx = ((angle/90)*speed);
+			}
 		}
-		sprite = new ImageIcon(url);
+		else if(angle>90 && angle<=180) {
+			angle -= 90;
+			
+			if(((angle/90)) <= 0.5) {
+				dy = ((1-(angle/90))*speed);
+				dx = -((angle/90)*speed);
+			}
+			else {
+				dy = (((1-angle)/90)*speed);
+				dx = -((angle/90)*speed);
+			}
+		}
+		else if(angle>180 && angle<=270) {
+			angle -= 180;
+			
+			if(((angle/90)) <= 0.5) {
+				dy = -((angle/90)*speed);
+				dx = -((1-(angle/90))*speed);
+			}
+			else {
+				dy = -((angle/90)*speed);
+				dx = -(((1-angle)/90)*speed);
+			}
+		}
+		else {
+			angle -= 270;
+			
+			if(((angle/90)) <= 0.5) {
+				dy = -(((1-angle)/90)*speed);
+				dx = ((angle/90)*speed);
+			}
+			else {
+				dy = -((1-(angle/90))*speed);
+				dx = ((angle/90)*speed);
+			}
+		}
+		
+		System.out.println("DX: "+dx);
+		System.out.println("DY: "+dy);
+		
+		state = MOVING;
 	}
 	
 	public synchronized void printStats() {
@@ -113,6 +168,7 @@ public class Monster extends Sprite implements Runnable {
 			
 			activeSleep = 100;
 			move();
+			//collisionCheck();
 			
 			/*
 			//Update state
@@ -147,13 +203,58 @@ public class Monster extends Sprite implements Runnable {
 		
 	}
 	
+	private void collisionCheck() {
+		int tileY = (ypos + (TILE_SIZE/2))/TILE_SIZE;
+		
+		if(dx < 0) {
+			int tile = (xpos/TILE_SIZE)+1;
+			if(xpos<tile && LoadMaps.getTile(tile, tileY)!=' '){
+				xpos = tile;
+			}
+		}
+		else if(dx > 0) {
+			int tile = (xpos/TILE_SIZE);
+			if(xpos>tile && LoadMaps.getTile(tile, tileY)!=' '){
+				xpos = tile-1;
+			}
+		}
+	}
+	
 //	private void checkRange() {
 //		// TODO Auto-generated method stub
 //		
 //	}
 
 	private void move() {
-		//temp hardcoded move.
+
+		/*if(state != MOVING) {
+			randomDirection();
+			return;
+		}
+		
+		if(xpos<0) {
+			xpos = 5;
+			randomDirection();
+		}
+		
+		if(xpos>APPLET_WIDTH) {
+			xpos = APPLET_WIDTH-5;
+			randomDirection();
+		}
+		
+		if(ypos<0) {
+			ypos = 5;
+			randomDirection();
+		}
+		
+		if(ypos>APPLET_HEIGHT) {
+			ypos = APPLET_HEIGHT-5;
+			randomDirection();
+		}
+		
+		xpos += dx;
+		ypos += dy;*/
+		
 		if ((state != MOVING_RIGHT) && (state != MOVING_LEFT)) state = MOVING_LEFT;
 		
 		if(xpos>=850 && state!=MOVING_LEFT) {
@@ -171,8 +272,6 @@ public class Monster extends Sprite implements Runnable {
 			xpos+=2;
 			turned = -1;
 		}
-		
-		
 		
 		//update coords
 		getCoords();
@@ -273,18 +372,6 @@ public class Monster extends Sprite implements Runnable {
 	
 	public boolean getAlive() {
 		return alive;
-	}
-	
-	public ImageIcon getImg() {
-		return sprite;
-	}
-	
-	public int getImgWidth() {
-		return sprite.getIconWidth();
-	}
-	
-	public int getImgHeight() {
-		return sprite.getIconHeight();
 	}
 	
 }

@@ -1,0 +1,33 @@
+// C = leftTopCorner
+// V = rightTopCorner
+// B = leftBottomCorner
+// N = rightBottomCorner
+// T = top
+// Q = bottom
+// R = right
+// L = left
+// H = Higher ground
+// E = Exit
+// I = InvertedLeftTopCorner
+// O = InvertedRightTopCorner
+// P = InvertedLeftBottomCorner
+// U = InvertedRightBottomCorner
+CTTTUEEPTTTTTTTTTTTTTTV
+L                     R
+L                     R
+L                     R
+L                     R
+L       IQO           R
+L       RHL           R
+L       RHL           R
+L       PTU           R
+L                     R
+L                     R
+L                     R
+L                     R
+L                     R
+L                     R
+L                     R
+L                     R
+L                     R
+BQQQQQQQQQQQQQQQQQQQQQN
