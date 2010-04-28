@@ -26,11 +26,14 @@ public class MonsterEcho {
 	private int turned;
 	
 	//Database
-	private Connection conn = null;
+	boolean connMadeHere = false;
 	
-	public MonsterEcho(int xpos, int ypos, int turned, int id, int monsterId, int health) {
+	public MonsterEcho(int xpos, int ypos, int turned, int id, int monsterId, int health, Connection conn) {
 		
-		conn = Database.connect();
+		if(conn == null) {
+			conn = Database.connect();
+			connMadeHere = true;
+		}
 		
 		if((id > 0) && (conn != null)) {
 			this.id = id; //Check uniqueness on higher level.
@@ -60,10 +63,12 @@ public class MonsterEcho {
 				System.out.println("stmt: "+SQL);
 				e.printStackTrace();
 			} finally {
-				try {
-					conn.close();
-				} catch (SQLException e) {}
-			}	
+				if(connMadeHere) {
+					try {
+						conn.close();
+					} catch (SQLException e) {}
+				}
+			}
 			
 		}
 		else {
