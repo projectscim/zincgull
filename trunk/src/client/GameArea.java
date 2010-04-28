@@ -4,14 +4,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.*;
 
+import local.Database;
 import local.Maps;
 
-public class GameArea extends JPanel implements ActionListener, KeyListener, Runnable{
+public class GameArea extends JPanel implements KeyListener, Runnable{
 	
 	private static final long serialVersionUID = -5572295459928673608L;
 	private static int myId;
@@ -20,7 +23,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private DataOutputStream dos;
 	private DataInputStream dis;
 	private int port = 49051;	//mapserver-port
-	private Timer tim = new Timer(20,this);
+	//private Timer tim = new Timer(20,this);
+	private Thread thread;
 	boolean[] arrowDown = new boolean[4];
 	boolean readMap = false;
 	private final static int monsterIdStart = 1000;
@@ -34,14 +38,18 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	protected static LinkedList<MonsterEcho> monster = new LinkedList<MonsterEcho>();
 	
+	Connection conn = null;
+	private static final long sleep = 10;
+	
 	public GameArea(int id) {
 		myId = id;
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
       	this.setDoubleBuffered(true);
-      	tim.addActionListener(this);
-		tim.start();
+      	
+      	//tim.addActionListener(this);
+		//tim.start();
 		connect(true, "80:50:1:1");	//try to connect, "true" because its the first time
 	}
 
@@ -49,10 +57,14 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		super.paintComponent(g);
 		for (int i=0;i<tiles.size();i++) {
 			for (int j=0;j < (tiles.get(i).length());j++) {
-				switch(tiles.get(j).charAt(j)) {
+				switch(tiles.get(i).charAt(j)) {
 				case 'G':
 					g.drawImage(groundTile.getImage(), TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, null);
 					break;
+				case 'S':
+					//asdf
+				default:
+					//asdf
 				}
 			}	
 		}
@@ -92,76 +104,90 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	//keep receiving messages from the server
 	public void run() {
 		
-		if(!readMap) {
-			new local.Maps();
-			
-			for(int i=0;i<Maps.getMapSegment().size();i++) {
-				tiles.add(Maps.getMapSegment().get(i));
-			}
-			
-			repaint();
-			readMap = true;
-		}
-		
-		try {
-			while (true) {
+		while(true) {
+			if(!readMap) {
+				new local.Maps();
 				
-				String coords = dis.readUTF();
-				if (!specialCommand(coords)) {
-					
-					String[] temp;
-					temp = coords.split(":");
-					
-					if(Integer.valueOf(temp[4]) < monsterIdStart) { //if player
-						Player ps = player.get(getId(Integer.valueOf(temp[4])));
-						if( !temp[4].equals( Integer.toString(myId) ) ){		//only paint new coordinates if they didnt come from this client
-							ps.setXpos(Integer.parseInt(temp[0]));
-							ps.setYpos(Integer.parseInt(temp[1]));
-							ps.setTurned(Integer.parseInt(temp[2]));
-							ps.setSpeed(Integer.parseInt(temp[3]));
-							repaint();
-						}	
-					}
-					else if((getMonster(temp[4]))==-1) { //Since not player, if monster not already added
-						System.out.println("add monster");
-						int x = Integer.parseInt(temp[0]);	//X-pos
-						int y = Integer.parseInt(temp[1]);	//Y-pos
-						int t = Integer.parseInt(temp[2]);	//turned (1/0)
-						int mi = Integer.parseInt(temp[3]);	//MonsterType-id, NOT UNIQUE
-						int i = Integer.parseInt(temp[4]);	//id, UNIQUE
-						int h = Integer.parseInt(temp[5]);	//health, the current health of the monster
-						
-						monster.add(new MonsterEcho(x,y,t,i,mi,h));
-						
-						repaint();
-					}
-					else { //not player and already added, update the MonsterEcho-object.
-						MonsterEcho m = monster.get(getMonster(temp[4]));
-						
-						m.setXpos(Integer.parseInt(temp[0]));
-						m.setYpos(Integer.parseInt(temp[1]));
-						m.setTurned(Integer.parseInt(temp[2]));
-						//m.setMonsterId(Integer.parseInt(temp[3])); 	No need, it will never change
-						//m.setId(Integer.parseInt(temp[4])); 			No need, it will never change
-						m.setHealth(Integer.parseInt(temp[5]));
-						
-						repaint();
-					}
-					
+				for(int i=0;i<Maps.getMapSegment().size();i++) {
+					tiles.add(Maps.getMapSegment().get(i));
 				}
+				
+				repaint();
+				readMap = true;
 			}
-		} catch( IOException ie ) {
-			Player p = player.get(getId(myId));
-			Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connection reset, reconnecting\n");
-			int x = p.getXpos();
-			int y = p.getYpos();
-			int t = p.getTurned();
-			int s = p.getSpeed();
-			Zincgull.connected = false;
-			player.clear();
-			repaint();
-			connect(false, x+":"+y+":"+t+":"+s);
-			return;
+			
+			try {
+				while (true) {
+					
+					//Keep database connection alive
+					if(conn == null) conn = Database.connect();
+					
+					String coords = dis.readUTF();
+					if (!specialCommand(coords)) {
+						
+						String[] temp;
+						temp = coords.split(":");
+						
+						if(Integer.valueOf(temp[4]) < monsterIdStart) { //if player
+							Player ps = player.get(getId(Integer.valueOf(temp[4])));
+							if( !temp[4].equals( Integer.toString(myId) ) ){		//only paint new coordinates if they didnt come from this client
+								ps.setXpos(Integer.parseInt(temp[0]));
+								ps.setYpos(Integer.parseInt(temp[1]));
+								ps.setTurned(Integer.parseInt(temp[2]));
+								ps.setSpeed(Integer.parseInt(temp[3]));
+								repaint();
+							}	
+						}
+						else if((getMonster(temp[4]))==-1) { //Since not player, if monster not already added
+							System.out.println("add monster");
+							int x = Integer.parseInt(temp[0]);	//X-pos
+							int y = Integer.parseInt(temp[1]);	//Y-pos
+							int t = Integer.parseInt(temp[2]);	//turned (1/0)
+							int mi = Integer.parseInt(temp[3]);	//MonsterType-id, NOT UNIQUE
+							int i = Integer.parseInt(temp[4]);	//id, UNIQUE
+							int h = Integer.parseInt(temp[5]);	//health, the current health of the monster
+							
+							monster.add(new MonsterEcho(x,y,t,i,mi,h,conn));
+							
+							repaint();
+						}
+						else { //not player and already added, update the MonsterEcho-object.
+							MonsterEcho m = monster.get(getMonster(temp[4]));
+							
+							m.setXpos(Integer.parseInt(temp[0]));
+							m.setYpos(Integer.parseInt(temp[1]));
+							m.setTurned(Integer.parseInt(temp[2]));
+							//m.setMonsterId(Integer.parseInt(temp[3])); 	No need, it will never change
+							//m.setId(Integer.parseInt(temp[4])); 			No need, it will never change
+							m.setHealth(Integer.parseInt(temp[5]));
+							
+							repaint();
+						}
+						
+					}
+					//No need to over-do it
+					try {
+						Thread.sleep(sleep);
+					} catch (InterruptedException e) {}
+				}
+			} catch( IOException ie ) {
+				
+				try {
+					conn.close();
+				} catch (SQLException e) {}
+				
+				Player p = player.get(getId(myId));
+				Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connection reset, reconnecting\n");
+				int x = p.getXpos();
+				int y = p.getYpos();
+				int t = p.getTurned();
+				int s = p.getSpeed();
+				Zincgull.connected = false;
+				player.clear();
+				repaint();
+				connect(false, x+":"+y+":"+t+":"+s);
+				return;
+			}
 		}
 	}
 
@@ -193,7 +219,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				dos = new DataOutputStream( socket.getOutputStream() );
 				dos.writeUTF("/HELLO "+position+":"+myId);
 				// Start a background thread for receiving coordinates
-				new Thread( this ).start();		//starts run()-method
+				//new Thread( this ).start();		//starts run()-method
+				new Thread(this).start();
 				if(!first) Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connected to mapserver\n");
 				return;
 			} catch( IOException e ) { 
@@ -202,6 +229,10 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 					Chat.chatOutput.append(Zincgull.getTime()+": MAP: Can't connect to server, trying again\n");
 					first = false;
 				}
+				//Sleep a bit
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e1) {}
 			}
 		}
 	}
@@ -216,19 +247,21 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	}
 	
 	public void keyPressed(KeyEvent e) {
+		lol();
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40){
 			arrowDown[40-e.getKeyCode()]=true;
 		}
 	}
 	
 	public void keyReleased(KeyEvent e) {
+		lol();
 		if(e.getKeyCode()>=37 && e.getKeyCode()<=40)
 			arrowDown[40-e.getKeyCode()]=false;
 	}
 
 	public void keyTyped(KeyEvent e) {}
 
-	public void actionPerformed(ActionEvent e) {
+	public void lol() {
 		if ( Zincgull.connected ) {
 			if (Zincgull.isMouseActive()&&(arrowDown[0]||arrowDown[1]||arrowDown[2]||arrowDown[3])) {
 				calculateMove();

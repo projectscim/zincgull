@@ -12,7 +12,7 @@ public class Maps {
 
 	private static BufferedReader bf;
 	private static final String path = "../maps/";
-	private static final String sgmnt1 = "1-1.txt";
+	private static final String sgmnt1 = "1-1.dat";
 	private static ArrayList<String> tiles = new ArrayList<String>();
 	
 	public Maps() {
@@ -56,6 +56,10 @@ public class Maps {
 	
 	public static ArrayList<String> getMapSegment() {
 		return tiles;
+	}
+	
+	public static void main(String[] args) {
+		new Maps();
 	}
 	
 }
