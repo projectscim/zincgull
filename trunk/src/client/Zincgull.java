@@ -12,7 +12,9 @@ import java.util.Random;
 
 import javax.swing.JApplet;
 
-public class Zincgull extends JApplet implements MouseListener{
+import local.GlobalConstants;
+
+public class Zincgull extends JApplet implements MouseListener, GlobalConstants{
 	private static final long serialVersionUID = 7197415241156375302L;
 	private static boolean mouseActive = false;
 
@@ -32,8 +34,8 @@ public class Zincgull extends JApplet implements MouseListener{
 		final int id = Integer.valueOf(getParameter("id"));
 		
 		//set size
-		setPreferredSize(new Dimension(736,798));
-		this.resize(736, 798);
+		setPreferredSize(new Dimension(APPLET_WIDTH,APPLET_HEIGHT));
+		this.resize(APPLET_WIDTH, APPLET_HEIGHT);
 		
 		System.out.println("Game about to start..");
 		
