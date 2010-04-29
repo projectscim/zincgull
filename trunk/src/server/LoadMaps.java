@@ -1,38 +1,43 @@
 package server;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
+//import java.io.File;
+//import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class LoadMaps {
 
 	private static BufferedReader bf;
-	private static final String path = "maps/";
-	private static final String sgmnt1 = "1-1.dat";
+//	private static final String path = "maps/";
+//	private static final String sgmnt1 = "1-1.dat";
 	private static ArrayList<String> tiles = new ArrayList<String>();
 	
 	public LoadMaps() {
-		loadMap(sgmnt1);
+		loadMap();
 	}
 	
-	private static int loadMap(String segment) {
+	private static int loadMap() {
 		String currentLine;
 		
 		//Load Map-file  
 		try {
+			URL url = new URL("http://utterfanskap.se/zincgull/includes/maps/1-1.dat");
+			
 			bf = new BufferedReader(
 				new InputStreamReader(
-				new FileInputStream(
-				new File(path+segment))));
+				url.openStream()));
 			
 		} catch (FileNotFoundException e1) {
-			System.out.println("Unable to Load: "+path+segment);
+			System.out.println("Unable to Load map");
 			e1.printStackTrace();
 			return -1;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		try {			
@@ -47,7 +52,7 @@ public class LoadMaps {
 			bf.close();
 			
 		} catch (IOException e) {
-			System.out.println("Failed to Read: "+segment);
+			System.out.println("Failed to Read map");
 			e.printStackTrace();
 			return -1;
 		}	
