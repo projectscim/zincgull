@@ -1,7 +1,5 @@
 package client;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,7 +31,7 @@ public class ImageBank {
 	 */
 	public ImageBank() {
 		
-		/*System.out.println("ImageBank created");
+		System.out.println("ImageBank created");
 		conn = Database.connect();
 		String SQL = "SELECT image FROM Monster ORDER BY id";
 		
@@ -74,40 +72,7 @@ public class ImageBank {
 			} catch (SQLException e) {
 				System.out.println("Failed to close Database-connection.");
 			}
-		}*/
-		
-		URL url;
-		try {
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/cuteBunny.png");	
-			ImageIcon asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/cuteKoala.png");
-			asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/rabidHound.png");
-			asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/basilisk.png");
-			asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/blackKnight.png");
-			asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			url = new URL("http://utterfanskap.se/zincgull/includes/images/monsters/whiteRabbit.png");
-			asdf = new ImageIcon(url);
-			monsters.add(asdf);
-			
-			
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 	}
 	
 	public static ImageIcon getImage(int id) {

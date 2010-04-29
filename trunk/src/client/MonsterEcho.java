@@ -28,9 +28,9 @@ public class MonsterEcho {
 	//Database
 	boolean connMadeHere = false;
 	
-	public MonsterEcho(int xpos, int ypos, int turned, int id, int monsterId, int health/*, Connection conn*/) {
+	public MonsterEcho(int xpos, int ypos, int turned, int id, int monsterId, int health, Connection conn) {
 		
-		/*if(conn == null) {
+		if(conn == null) {
 			conn = Database.connect();
 			connMadeHere = true;
 		}
@@ -82,16 +82,7 @@ public class MonsterEcho {
 			this.xpos = -100;
 			this.ypos = -100;
 			this.turned = 0;
-		}*/
-		
-		this.id = id; //Check uniqueness on higher level.
-		this.monsterId = monsterId; //not unique
-		this.health = health;
-		this.xpos = xpos;
-		this.ypos = ypos;
-		this.turned = turned;
-		
-		
+		}
 	}
 	
 	
