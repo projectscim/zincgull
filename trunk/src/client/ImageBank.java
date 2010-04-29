@@ -16,7 +16,7 @@ public class ImageBank {
 	private static ArrayList<ImageIcon> monsters = new ArrayList<ImageIcon>();
 	private Connection conn = null;
 	private static ImageIcon img;
-	private static ImageIcon monsterFail = new ImageIcon("../images/error/monsterFail.png");
+	//private static ImageIcon monsterFail = new ImageIcon("../images/error/monsterFail.png");
 	//private static Image img;
 	//private static Image monsterFail;
 	
@@ -78,7 +78,8 @@ public class ImageBank {
 	public static ImageIcon getImage(int id) {
 		id -= 1; //Offset because db-table starts from 1 while ArrayList starts from 0.
 		if(monsters.get(id) != null) return (monsters.get(id));
-		else return monsterFail;
+		//else return monsterFail;
+		return null;
 	}
 	
 	//For testing purposes

@@ -1,14 +1,9 @@
 package server;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Random;
-
-import javax.swing.ImageIcon;
 
 import local.GlobalConstants;
 
-import client.LoadMap;
 import client.Sprite;
 
 /**
@@ -82,51 +77,54 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		
 		if(angle<=90) {
 			
-			if(((angle/90)) <= 0.5) {
-				dy = ((angle/90)*speed);
-				dx = ((1-(angle/90))*speed);
+			if(((angle/90)) >= 0.5) {
+				dy = (angle/90);
+				dx = (1-(angle/90));
 			}
 			else {
-				dy = ((1-(angle/90))*speed);
-				dx = ((angle/90)*speed);
+				dy = (1-(angle/90));
+				dx = (angle/90);
 			}
 		}
 		else if(angle>90 && angle<=180) {
 			angle -= 90;
 			
 			if(((angle/90)) <= 0.5) {
-				dy = ((1-(angle/90))*speed);
-				dx = -((angle/90)*speed);
+				dy = (1-(angle/90));
+				dx = -(angle/90);
 			}
 			else {
-				dy = (((1-angle)/90)*speed);
-				dx = -((angle/90)*speed);
+				dy = ((1-angle)/90);
+				dx = -(angle/90);
 			}
 		}
 		else if(angle>180 && angle<=270) {
 			angle -= 180;
 			
 			if(((angle/90)) <= 0.5) {
-				dy = -((angle/90)*speed);
-				dx = -((1-(angle/90))*speed);
+				dy = -(angle/90);
+				dx = -(1-(angle/90));
 			}
 			else {
-				dy = -((angle/90)*speed);
-				dx = -(((1-angle)/90)*speed);
+				dy = -(angle/90);
+				dx = -((1-angle)/90);
 			}
 		}
 		else {
 			angle -= 270;
 			
 			if(((angle/90)) <= 0.5) {
-				dy = -(((1-angle)/90)*speed);
-				dx = ((angle/90)*speed);
+				dy = -((1-angle)/90);
+				dx = (angle/90);
 			}
 			else {
-				dy = -((1-(angle/90))*speed);
-				dx = ((angle/90)*speed);
+				dy = -(1-(angle/90));
+				dx = (angle/90);
 			}
 		}
+		
+		dx *= speed;
+		dy *= speed;
 		
 		System.out.println("DX: "+dx);
 		System.out.println("DY: "+dy);
@@ -156,7 +154,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 				+ String.valueOf(monsterId)+":"
 				+ String.valueOf(id)+":"
 				+ String.valueOf(health));
-	
+		
 		return coords;
 	}
 
@@ -167,13 +165,15 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		while(alive) {
 			
 			activeSleep = 100;
-			move();
-			//collisionCheck();
-			
-			/*
 			//Update state
 			update();
 			
+			move();
+			//collisionCheck();
+			
+			
+			
+			/*
 			if(state==WAITING) {
 				//do nothing
 				activeSleep = idleSleep;
@@ -227,7 +227,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 
 	private void move() {
 
-		/*if(state != MOVING) {
+		if(state != MOVING) {
 			randomDirection();
 			return;
 		}
@@ -252,26 +252,8 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 			randomDirection();
 		}
 		
-		xpos += dx;
-		ypos += dy;*/
-		
-		if ((state != MOVING_RIGHT) && (state != MOVING_LEFT)) state = MOVING_LEFT;
-		
-		if(xpos>=850 && state!=MOVING_LEFT) {
-			state = MOVING_LEFT;
-		}
-		else if(xpos<=100 && state!=MOVING_RIGHT) {
-			state = MOVING_RIGHT;
-		}
-		
-		if (state == MOVING_LEFT) {
-			xpos-=2;
-			turned = 1;
-		}
-		else if(state == MOVING_RIGHT) {
-			xpos+=2;
-			turned = -1;
-		}
+		xpos = (int) (xpos + dx);
+		ypos = (int) (ypos + dy);
 		
 		//update coords
 		getCoords();
@@ -287,10 +269,11 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 //		
 //	}
 //
-//	private void update() {
-//		state = ATTACKING;
-//		
-//	}
+	private void update() {
+		if(dx>0) turned = NOT_TURNED;
+		else turned = TURNED;
+		
+	}
 	
 	
 	//a Shitload of getters/setters

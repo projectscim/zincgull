@@ -20,17 +20,17 @@ public class ZincgullServer {
 		
 		System.out.println("Starting MonsterDatabase");
 		new MonsterDatabase();
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		
 		System.out.println("Starting ChatServer");
 		CS = new ChatSrv(chatPort);
 		CS.start();
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		
 		System.out.println("Starting MapServer");
 		MapS = new MapSrv(mapPort);
 		MapS.start();
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		
 		System.out.println("Starting MonsterService");
 		MS = new MonsterService(MapS);

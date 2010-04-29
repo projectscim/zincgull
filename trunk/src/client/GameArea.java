@@ -153,7 +153,6 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		}
 		
 		for (int i=0;i<monster.size();i++) {
-			
 			MonsterEcho m = monster.get(i);
 			ImageIcon img = ImageBank.getImage(m.getMonsterId());
 			
@@ -163,8 +162,6 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 					img.getIconWidth()*monster.get(i).getTurned(),
 					img.getIconHeight(),
 					null);
-			
-			System.out.println("Painted: "+m.getName()+" @: "+m.getXpos()+"x "+m.getYpos()+"y");
 		}
 		
 		if(Zincgull.isMouseActive()){
@@ -223,9 +220,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 							repaint();
 						}
 						else { //not player and already added, update the MonsterEcho-object.
-							
-							System.out.println("WHY CANT I SEE THIS!! =(");
-							
+														
 							MonsterEcho m = monster.get(getMonster(temp[4]));
 							
 							m.setXpos(Integer.parseInt(temp[0]));

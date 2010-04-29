@@ -33,6 +33,7 @@ public class Database implements SecretDBinfo {
 					"ERROR: Connection FAILED");
 			conn = null;
 		} catch (SQLException e) {
+			e.printStackTrace();
 			System.out.println("ERROR: SQLException\n" +
 					"ERROR: Connection FAILED");
 			conn = null;
