@@ -37,7 +37,7 @@ public class MonsterService extends Thread {
 		BasicConfigurator.configure();
 		log.info("MonsterService created");
 		
-		monsterLimit = 7;
+		monsterLimit = 4;
 		chanceOfSurge = 5000; //one in .. every 'sleep'
 		chanceToEndSurge = 10; //one in .. every 'sleep'
 		log.info("Monster limit is set to: "+monsterLimit);
