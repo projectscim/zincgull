@@ -75,7 +75,7 @@ public class MapSrv extends Thread {
 			positions.remove(getId(d));
 			System.out.println( "USR "+getTime()+": Lost connection from "+s );
 			getOutputStreams().remove( s );
-			sendToAll("/SUB "+d);
+			sendToAll("/SUB "+(int)d);
 			if(positions.isEmpty()) System.out.println( "USR "+getTime()+": No users online" );
 			try {
 				s.close();

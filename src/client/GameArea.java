@@ -28,34 +28,63 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	boolean readMap = false;
 	private final static int monsterIdStart = 1000;
 	
-	private ArrayList<String> tiles = new ArrayList<String>();
-	private ImageIcon[] groundTile = {new ImageIcon("../images/tiles/ground.png"),
-										new ImageIcon("../images/tiles/topStop.png"),
-										new ImageIcon("../images/tiles/leftStop.png"),
-										new ImageIcon("../images/tiles/rightStop.png"),
-										new ImageIcon("../images/tiles/bottomStop.png"),
-										new ImageIcon("../images/tiles/leftTopCorner.png"),
-										new ImageIcon("../images/tiles/rightTopCorner.png"),
-										new ImageIcon("../images/tiles/leftBottomCorner.png"),
-										new ImageIcon("../images/tiles/rightBottomCorner.png"),
-										new ImageIcon("../images/tiles/exit.png"),
-										new ImageIcon("../images/tiles/highGround.png"),
-										new ImageIcon("../images/tiles/invLeftTopCorner.png"),
-										new ImageIcon("../images/tiles/invRightTopCorner.png"),
-										new ImageIcon("../images/tiles/invLeftBottomCorner.png"),
-										new ImageIcon("../images/tiles/invRightBottomCorner.png")};
+	private URL url;
 	
-	private ImageIcon[] playerImg = {new ImageIcon("../images/players/player.png"),
-									new ImageIcon("../images/players/otherPlayer.png")};
+	private ArrayList<String> tiles = new ArrayList<String>();
+	private ImageIcon[] groundTile = new ImageIcon[15];
+	
+	private ImageIcon[] playerImg = new ImageIcon[2];
 	
 	protected static LinkedList<Player> player = new LinkedList<Player>();
 	protected static LinkedList<MonsterEcho> monster = new LinkedList<MonsterEcho>();
 	
-	Connection conn = null;
+	//Connection conn = null;
 	private static final long sleep = 5;
 	
 	public GameArea(int id) {
 		myId = id;
+		
+		try {
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/players/player.png");		
+			playerImg[0] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/players/otherPlayer.png");
+			playerImg[1] = new ImageIcon(url);
+			
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/ground.png");
+			groundTile[0] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/topStop.png");
+			groundTile[1] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/leftStop.png");
+			groundTile[2] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/rightStop.png");
+			groundTile[3] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/bottomStop.png");
+			groundTile[4] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/leftTopCorner.png");
+			groundTile[5] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/rightTopCorner.png");
+			groundTile[6] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/leftBottomCorner.png");
+			groundTile[7] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/rightBottomCorner.png");
+			groundTile[8] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/exit.png");
+			groundTile[9] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/highGround.png");
+			groundTile[10] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/invLeftTopCorner.png");
+			groundTile[11] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/invRightTopCorner.png");
+			groundTile[12] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/invLeftBottomCorner.png");
+			groundTile[13] = new ImageIcon(url);
+			url = new URL("http://utterfanskap.se/zincgull/includes/images/tiles/invRightBottomCorner.png");
+			groundTile[14] = new ImageIcon(url);
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
       	this.addKeyListener(this);
       	this.setBackground(Color.WHITE);
@@ -188,7 +217,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				while (true) {
 					
 					//Keep database connection alive
-					if(conn == null) conn = Database.connect();
+					//if(conn == null) conn = Database.connect();
 					
 					String coords = dis.readUTF();
 					if (!specialCommand(coords)) {
@@ -215,7 +244,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 							int i = Integer.parseInt(temp[4]);	//id, UNIQUE
 							int h = Integer.parseInt(temp[5]);	//health, the current health of the monster
 							
-							monster.add(new MonsterEcho(x,y,t,i,mi,h,conn));
+							monster.add(new MonsterEcho(x,y,t,i,mi,h/*,conn*/));
 							
 							repaint();
 						}
@@ -238,9 +267,9 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				}
 			} catch( IOException ie ) {
 				
-				try {
+				/*try {
 					conn.close();
-				} catch (SQLException e) {}
+				} catch (SQLException e) {}*/
 				
 				Player p = player.get(getId(myId));
 				Chat.chatOutput.append(Zincgull.getTime()+": MAP: Connection reset, reconnecting\n");
@@ -355,6 +384,44 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			p.setXpos(p.getXpos()-p.getSpeed());
 			p.setTurned(Player.TURNED);
 		}
+		checkCollision(p);
+	}
+	
+	private void checkCollision(Player p) {
+		int tx1 = (p.getXpos()-(TILE_SIZE/2))/TILE_SIZE;
+		int tx2 = ((p.getXpos()-(TILE_SIZE/2))+TILE_SIZE)/TILE_SIZE;
+		int ty1 = p.getYpos()/TILE_SIZE;
+		int ty2 = (p.getYpos()+TILE_SIZE)/TILE_SIZE;
+		
+		
+		if(arrowDown[3]) {
+			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx1, ty2)!=' ')) {
+				int asdf = (tx1*TILE_SIZE);
+				p.setXpos(asdf+1+(TILE_SIZE/2)+TILE_SIZE);
+			}
+			tx1 += 1;
+			tx2 += 2;
+		}else if(arrowDown[1]) {
+			if((LoadMap.getTile(tx2, ty1)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
+				int asdf = (tx2*TILE_SIZE);
+				p.setXpos(asdf-1-(TILE_SIZE/2));
+			}
+			tx1 -= 1;
+			tx2 -= 1;
+		}
+		
+		if(arrowDown[2]) {
+			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx2, ty1)!=' ')) {
+				int asdf = (ty1*TILE_SIZE)+TILE_SIZE;
+				p.setYpos(asdf+1);
+			}
+		}else if(arrowDown[0]) {
+			if((LoadMap.getTile(tx1, ty2)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
+				int asdf = (ty2*TILE_SIZE)-TILE_SIZE;
+				p.setYpos(asdf-1);
+			}
+		}
+		
 	}
 	
 	//possible commands the server can send
