@@ -370,6 +370,18 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void calculateMove() {
 		Player p = player.get(getId(myId));
+		
+		int j = 0;
+		for (int i = 0; i < arrowDown.length; i++) {
+			if(arrowDown[i]) j++;
+			if(j>2) return;
+		}
+		
+		if(arrowDown[3]&&arrowDown[1]) return;
+		else if(arrowDown[0]&&arrowDown[2]) return;
+		
+		checkCollision(p);
+		
 		if(arrowDown[0]){
 			p.setYpos(p.getYpos()+p.getSpeed());
 		}
@@ -384,7 +396,6 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			p.setXpos(p.getXpos()-p.getSpeed());
 			p.setTurned(Player.TURNED);
 		}
-		checkCollision(p);
 	}
 	
 	private void checkCollision(Player p) {
@@ -392,38 +403,31 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		int tx2 = ((p.getXpos()-(TILE_SIZE/2))+TILE_SIZE)/TILE_SIZE;
 		int ty1 = p.getYpos()/TILE_SIZE;
 		int ty2 = (p.getYpos()+TILE_SIZE)/TILE_SIZE;
-		
-		
+			
 		if(arrowDown[3]) {
 			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx1, ty2)!=' ')) {
 				int asdf = (tx1*TILE_SIZE);
-				p.setXpos(asdf+1+(TILE_SIZE/2)+TILE_SIZE);
+				p.setXpos(asdf+2+(TILE_SIZE/2)+TILE_SIZE);
 			}
-			tx1 += 1;
-			tx2 += 2;
 		}else if(arrowDown[1]) {
 			if((LoadMap.getTile(tx2, ty1)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
 				int asdf = (tx2*TILE_SIZE);
-				p.setXpos(asdf-1-(TILE_SIZE/2));
+				p.setXpos(asdf-2-(TILE_SIZE/2));
 			}
-			tx1 -= 1;
-			tx2 -= 1;
-		}
-		
-		if(arrowDown[2]) {
+		}else if(arrowDown[2]) {
 			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx2, ty1)!=' ')) {
 				int asdf = (ty1*TILE_SIZE)+TILE_SIZE;
-				p.setYpos(asdf+1);
+				p.setYpos(asdf+2);
 			}
 		}else if(arrowDown[0]) {
 			if((LoadMap.getTile(tx1, ty2)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
 				int asdf = (ty2*TILE_SIZE)-TILE_SIZE;
-				p.setYpos(asdf-1);
+				p.setYpos(asdf-2);
 			}
 		}
 		
 	}
-	
+
 	//possible commands the server can send
 	public boolean specialCommand( String msg ){
 		String[] temp;

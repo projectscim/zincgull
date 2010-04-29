@@ -3,7 +3,6 @@ package server;
 import java.util.Random;
 
 import local.GlobalConstants;
-
 import client.Sprite;
 
 /**
@@ -46,8 +45,8 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 	private static final int MOVING_RIGHT = 2;
 	private static final int MOVING_LEFT = 3;
 	
-	private static double dx;
-	private static double dy;
+	private double dx;
+	private double dy;
 	
 	private boolean alive;
 	
@@ -56,13 +55,13 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		xpos = DEFAULT_XPOS;
 		ypos = DEFAULT_YPOS;
 		
-		speed = 5;
+		speed = 3;
 	}
 	
 	private void randomDirection() {
 		//Randomize movement direction
 		Random randomize = new Random();
-		int angle = randomize.nextInt(361);
+		int angle = randomize.nextInt(4);
 		
 		System.out.println("RANDOM ANGLE: "+angle);
 		
@@ -75,7 +74,23 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		
 		double speed = (double)(this.speed);
 		
-		if(angle<=90) {
+		if(angle == 0) {
+			dx = 1;
+			dy = 0;
+		} else if(angle == 1) {
+			dx = -1;
+			dy = 0;
+		} else if(angle == 2) {
+			dx = 0;
+			dy = 1;
+		} else {
+			dx = 0;
+			dy = -1;
+		}
+		
+		
+		
+		/*if(angle<=90) {
 			
 			if(((angle/90)) >= 0.5) {
 				dy = (angle/90);
@@ -121,7 +136,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 				dy = -(1-(angle/90));
 				dx = (angle/90);
 			}
-		}
+		}*/
 		
 		dx *= speed;
 		dy *= speed;
@@ -162,6 +177,8 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		
 		alive = true;
 		
+		randomDirection();
+		
 		while(alive) {
 			
 			activeSleep = 100;
@@ -169,7 +186,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 			update();
 			
 			move();
-			//collisionCheck();
+			if(collisionCheck()) randomDirection();
 			
 			
 			
@@ -203,8 +220,8 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 		
 	}
 	
-	private void collisionCheck() {
-		int tileY = (ypos + (TILE_SIZE/2))/TILE_SIZE;
+	private boolean collisionCheck() {
+		/*int tileY = (ypos + (TILE_SIZE/2))/TILE_SIZE;
 		
 		if(dx < 0) {
 			int tile = (xpos/TILE_SIZE)+1;
@@ -217,7 +234,50 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 			if(xpos>tile && LoadMaps.getTile(tile, tileY)!=' '){
 				xpos = tile-1;
 			}
+		}*/
+				
+		int tx1 = (xpos-(TILE_SIZE/2))/TILE_SIZE;
+		int tx2 = ((xpos-(TILE_SIZE/2))+TILE_SIZE)/TILE_SIZE;
+		int ty1 = ypos/TILE_SIZE;
+		int ty2 = (ypos+TILE_SIZE)/TILE_SIZE;
+		
+		if(tx1<0) tx1 = 0;
+		if(tx2<0) tx2 = 0;
+		if(ty1<0) ty1 = 0;
+		if(ty2<0) ty2 = 0;
+			
+		if(dx<0) {
+			if((LoadMaps.getTile(tx1, ty1)!=' ') || (LoadMaps.getTile(tx1, ty2)!=' ')) {
+				int asdf = (tx1*TILE_SIZE);
+				xpos = (asdf+2+(TILE_SIZE/2)+TILE_SIZE);
+
+				return true;
+			}
+		}else if(dx>0) {
+			if((LoadMaps.getTile(tx2, ty1)!=' ') || (LoadMaps.getTile(tx2, ty2)!=' ')) {
+				int asdf = (tx2*TILE_SIZE);
+				xpos = (asdf-2-(TILE_SIZE/2));
+
+				return true;
+			}
+		}else if(dy<0) {
+			if((LoadMaps.getTile(tx1, ty1)!=' ') || (LoadMaps.getTile(tx2, ty1)!=' ')) {
+				int asdf = (ty1*TILE_SIZE)+TILE_SIZE;
+				ypos = (asdf+2);
+
+				return true;
+			}
+		}else if(dy>0) {
+			if((LoadMaps.getTile(tx1, ty2)!=' ') || (LoadMaps.getTile(tx2, ty2)!=' ')) {
+				int asdf = (ty2*TILE_SIZE)-TILE_SIZE;
+				ypos = (asdf-2);
+
+				return true;
+			}
 		}
+		
+		
+		return false;
 	}
 	
 //	private void checkRange() {
@@ -225,33 +285,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 //		
 //	}
 
-	private void move() {
-
-		if(state != MOVING) {
-			randomDirection();
-			return;
-		}
-		
-		if(xpos<0) {
-			xpos = 5;
-			randomDirection();
-		}
-		
-		if(xpos>APPLET_WIDTH) {
-			xpos = APPLET_WIDTH-5;
-			randomDirection();
-		}
-		
-		if(ypos<0) {
-			ypos = 5;
-			randomDirection();
-		}
-		
-		if(ypos>APPLET_HEIGHT) {
-			ypos = APPLET_HEIGHT-5;
-			randomDirection();
-		}
-		
+	private void move() {		
 		xpos = (int) (xpos + dx);
 		ypos = (int) (ypos + dy);
 		
@@ -270,7 +304,7 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 //	}
 //
 	private void update() {
-		if(dx>0) turned = NOT_TURNED;
+		if(dx<0) turned = NOT_TURNED;
 		else turned = TURNED;
 		
 	}
