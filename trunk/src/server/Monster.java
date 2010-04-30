@@ -286,6 +286,14 @@ public class Monster extends Sprite implements Runnable, GlobalConstants{
 //	}
 
 	private void move() {		
+
+		Random randomize = new Random();
+		int asdf = randomize.nextInt(20);
+		
+		if(asdf==4) {
+			randomDirection();
+		}
+		
 		xpos = (int) (xpos + dx);
 		ypos = (int) (ypos + dy);
 		

@@ -147,7 +147,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 						(p.getXpos()-p.getTurned()*(playerImg[imgInt].getIconWidth()/2)),
 						p.getYpos(),
 						(p.getTurned()*playerImg[imgInt].getIconWidth()),
-						(playerImg[imgInt].getIconHeight()),
+						(playerImg[imgInt].getIconHeight()*p.getDead()),
 						null);
 			}
 		}
@@ -341,7 +341,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 
 	private void calculateMove() {
 		Player p = player.get(getId(myId));
-		
+		if(p.getDead()==-1) return;
 		int j = 0;
 		for (int i = 0; i < arrowDown.length; i++) {
 			if(arrowDown[i]) j++;
@@ -352,6 +352,9 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		else if(arrowDown[0]&&arrowDown[2]) return;
 		
 		checkCollision(p);
+		for(int i=0;i<monster.size();i++) {
+			checkMonsterCollision(p, monster.get(i));	
+		}
 		
 		if(arrowDown[0]){
 			p.setYpos(p.getYpos()+p.getSpeed());
@@ -369,6 +372,27 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		}
 	}
 	
+	private void checkMonsterCollision(Player p, MonsterEcho e) {
+		int px1 = p.getXpos() - (TILE_SIZE/2);
+		int px2 = p.getXpos() + (TILE_SIZE/2);
+		int py1 = p.getYpos();
+		int py2 = p.getYpos() + TILE_SIZE;
+		
+		int ex1 = e.getXpos() - (TILE_SIZE/2);
+		int ex2 = e.getXpos() + (TILE_SIZE/2);
+		int ey1 = e.getYpos();
+		int ey2 = e.getYpos() + TILE_SIZE;
+		
+		if(px1 > ex1 && px1 < ex2  &&
+				((py1 > ey1 && py1 < ey2) || (py2 > ey1 && py2 < ey2))) {
+			p.setDead(-1);
+		}
+		if(px2 < ex2 && px2 > ex1 &&
+				((py1 > ey1 && py1 < ey2) || (py2 > ey1 && py2 < ey2))) {
+			p.setDead(-1);
+		}
+	}
+
 	private void checkCollision(Player p) {
 		int tx1 = (p.getXpos()-(TILE_SIZE/2))/TILE_SIZE;
 		int tx2 = ((p.getXpos()-(TILE_SIZE/2))+TILE_SIZE)/TILE_SIZE;
@@ -413,7 +437,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			player.add(new Player(x,y,t,s,i));
 			Zincgull.connected = true;
 			repaint();
-			return true;	
+			return true;
 			
 		}else if( msg.substring(0, 4).equals("/SUB") ){
 			//player.remove(getId( Double.parseDouble(temp[4]) ));

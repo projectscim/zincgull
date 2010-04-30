@@ -17,6 +17,7 @@ public class Player extends Sprite {
 	private int level;
 	private int xp;
 	private boolean gm;
+	private int dead = 1;
 	
 	public Player(int id) {
 		this.id = id;
@@ -81,5 +82,13 @@ public class Player extends Sprite {
 	
 	public double getId() {
 		return id;
+	}
+
+	public void setDead(int dead) {
+		this.dead = dead;
+	}
+
+	public int getDead() {
+		return dead;
 	}
 }
