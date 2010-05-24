@@ -28,6 +28,14 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	boolean readMap = false;
 	private final static int monsterIdStart = 1000;
 	
+	private static boolean LOCK_LEFT = false;
+	private static boolean LOCK_RIGHT = false;
+	private static boolean LOCK_UP = false;
+	private static boolean LOCK_DOWN = false;
+	
+	private javazoom.jl.player.Player mp3Player;
+	private static final String mp3File = "../sound/title.mp3"; 
+	
 	private ArrayList<String> tiles = new ArrayList<String>();
 	private ImageIcon[] groundTile = {new ImageIcon("../images/tiles/ground.png"),
 										new ImageIcon("../images/tiles/topStop.png"),
@@ -64,6 +72,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
       	tim.addActionListener(this);
 		tim.start();
 		connect(true, "80:50:1:1");	//try to connect, "true" because its the first time
+		
+		createBgSound();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -352,24 +362,29 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		else if(arrowDown[0]&&arrowDown[2]) return;
 		
 		checkCollision(p);
-		for(int i=0;i<monster.size();i++) {
-			checkMonsterCollision(p, monster.get(i));	
-		}
 		
-		if(arrowDown[0]){
-			p.setYpos(p.getYpos()+p.getSpeed());
-		}
-		if(arrowDown[1]){
-			p.setXpos(p.getXpos()+p.getSpeed());
-			p.setTurned(Player.NOT_TURNED);
-		}
-		if(arrowDown[2]){
-			p.setYpos(p.getYpos()-p.getSpeed());
-		}
-		if(arrowDown[3]){
+		if(!LOCK_LEFT && arrowDown[3]) {
 			p.setXpos(p.getXpos()-p.getSpeed());
 			p.setTurned(Player.TURNED);
 		}
+		
+		if(!LOCK_RIGHT && arrowDown[1]) {
+			p.setXpos(p.getXpos()+p.getSpeed());
+			p.setTurned(Player.NOT_TURNED);
+		}
+		
+		if(!LOCK_UP && arrowDown[2]) {
+			p.setYpos(p.getYpos()-p.getSpeed());
+		}
+		
+		if(!LOCK_DOWN && arrowDown[0]) {
+			p.setYpos(p.getYpos()+p.getSpeed());
+		}	
+		
+		for(int i=0;i<monster.size();i++) {
+			checkMonsterCollision(p, monster.get(i));
+		}
+			
 	}
 	
 	private void checkMonsterCollision(Player p, MonsterEcho e) {
@@ -398,29 +413,57 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 		int tx2 = ((p.getXpos()-(TILE_SIZE/2))+TILE_SIZE)/TILE_SIZE;
 		int ty1 = p.getYpos()/TILE_SIZE;
 		int ty2 = (p.getYpos()+TILE_SIZE)/TILE_SIZE;
-			
+		
+		char tile1;
+		char tile2;
+		
 		if(arrowDown[3]) {
-			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx1, ty2)!=' ')) {
-				int asdf = (tx1*TILE_SIZE);
-				p.setXpos(asdf+2+(TILE_SIZE/2)+TILE_SIZE);
+			int stx1 = (p.getXpos()-(TILE_SIZE/2)-p.getSpeed())/TILE_SIZE; //With Simulated Move
+			tile1 = LoadMap.getTile(stx1, ty1);
+			tile2 = LoadMap.getTile(stx1, ty2);
+			if((tile1!=' ' && tile1!='E') || (tile2!=' ' && tile2!='E')) {
+				LOCK_LEFT = true;
 			}
-		}else if(arrowDown[1]) {
-			if((LoadMap.getTile(tx2, ty1)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
-				int asdf = (tx2*TILE_SIZE);
-				p.setXpos(asdf-2-(TILE_SIZE/2));
-			}
-		}else if(arrowDown[2]) {
-			if((LoadMap.getTile(tx1, ty1)!=' ') || (LoadMap.getTile(tx2, ty1)!=' ')) {
-				int asdf = (ty1*TILE_SIZE)+TILE_SIZE;
-				p.setYpos(asdf+2);
-			}
-		}else if(arrowDown[0]) {
-			if((LoadMap.getTile(tx1, ty2)!=' ') || (LoadMap.getTile(tx2, ty2)!=' ')) {
-				int asdf = (ty2*TILE_SIZE)-TILE_SIZE;
-				p.setYpos(asdf-2);
+			else {
+				LOCK_LEFT = false;
 			}
 		}
 		
+		if(arrowDown[1]) {
+			int stx2 = ((p.getXpos()-(TILE_SIZE/2))+TILE_SIZE+p.getSpeed())/TILE_SIZE; //With Simulated Move
+			tile1 = LoadMap.getTile(stx2, ty1);
+			tile2 = LoadMap.getTile(stx2, ty2);
+			if((tile1!=' ' && tile1!='E') || (tile2!=' ' && tile2!='E')) {
+				LOCK_RIGHT = true;
+			}
+			else {
+				LOCK_RIGHT = false;
+			}
+		}
+		
+		if(arrowDown[2]) {
+			int sty1 = (p.getYpos()-p.getSpeed())/TILE_SIZE; //With Simulated Move
+			tile1 = LoadMap.getTile(tx1, sty1);
+			tile2 = LoadMap.getTile(tx2, sty1);
+			if((tile1!=' ' && tile1!='E') || (tile2!=' ' && tile2!='E')) {
+				LOCK_UP = true;
+			}
+			else {
+				LOCK_UP = false;
+			}
+		}
+		
+		if(arrowDown[0]) {
+			int sty2 = (p.getYpos()+TILE_SIZE+p.getSpeed())/TILE_SIZE; //With Simulated Move
+			tile1 = LoadMap.getTile(tx1, sty2);
+			tile2 = LoadMap.getTile(tx2, sty2);
+			if((tile1!=' ' && tile1!='E') || (tile2!=' ' && tile2!='E')) {
+				LOCK_DOWN = true;
+			}
+			else {
+				LOCK_DOWN = false;
+			}
+		}	
 	}
 	
 	//possible commands the server can send
@@ -449,5 +492,42 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Plays specified mp3-file.
+	 * <br> 
+	 * More or Less Copy/Paste from http://www.cs.princeton.edu/introcs/faq/mp3/MP3.java.html but without any means of stopping the sound.
+	 * Added awesome looping capabilities. =D
+	 */
+	private void createBgSound() {		
+		try {
+            FileInputStream fis     = new FileInputStream(mp3File);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            mp3Player = new javazoom.jl.player.Player(bis);
+        }
+        catch (Exception e) {
+            System.out.println("Problem playing file " + mp3File);
+            System.out.println(e);
+        }
+
+        // run in new thread to play in background
+        new Thread() {
+            public void run() {
+                try { 
+                	mp3Player.play();
+                }
+                catch (Exception e) { 
+                	System.out.println(e); 
+                	try {Thread.sleep(5000);} catch (InterruptedException e1) {}
+                }
+                finally {
+                	//if(!shutdown) {
+                		createBgSound(); //Rekursion ftw
+                	//}
+                }
+                
+            }
+        }.start();
 	}
 }
