@@ -34,6 +34,7 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 	private static boolean LOCK_DOWN = false;
 	
 	private javazoom.jl.player.Player mp3Player;
+	private static final String soundDir = "../sound/";
 	private static final String mp3File = "../sound/title.mp3"; 
 	
 	private ArrayList<String> tiles = new ArrayList<String>();
@@ -381,10 +382,11 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 			p.setYpos(p.getYpos()+p.getSpeed());
 		}	
 		
-		for(int i=0;i<monster.size();i++) {
-			checkMonsterCollision(p, monster.get(i));
+		if(p.getDead() != -1) {
+			for(int i=0;i<monster.size();i++) {
+				checkMonsterCollision(p, monster.get(i));
+			}
 		}
-			
 	}
 	
 	private void checkMonsterCollision(Player p, MonsterEcho e) {
@@ -406,6 +408,8 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
 				((py1 > ey1 && py1 < ey2) || (py2 > ey1 && py2 < ey2))) {
 			p.setDead(-1);
 		}
+
+		if(p.getDead() == -1) playSound("playerDead");
 	}
 
 	private void checkCollision(Player p) {
@@ -522,12 +526,49 @@ public class GameArea extends JPanel implements ActionListener, KeyListener, Run
                 	try {Thread.sleep(5000);} catch (InterruptedException e1) {}
                 }
                 finally {
-                	//if(!shutdown) {
-                		createBgSound(); //Rekursion ftw
-                	//}
+                	createBgSound(); //Rekursion ftw
                 }
                 
             }
         }.start();
+	}
+	
+	private void playSound(String sound) {
+		playSound(sound, false);
+	}
+	
+	private void playSound(String sound, boolean loop) {
+		//Remove file-extension before comparison if any 
+		if(sound.endsWith(".mp3")) sound.substring(0, (sound.length()-5));
+		
+		//check sound-name against template, else try to load with the provided name
+		if(sound.equalsIgnoreCase("playerDeath") || sound.equalsIgnoreCase("playerDead")) sound = "playerDeath";
+		
+		//Add default file-extension
+		sound = sound.concat(".mp3");
+		
+		try {
+			//Add dir-path and try to open file
+            FileInputStream fis = new FileInputStream(soundDir+sound);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            mp3Player = new javazoom.jl.player.Player(bis);
+            
+            //run in new thread to play in background
+            new Thread() {
+                public void run() {
+                    try { 
+                    	mp3Player.play();
+                    }
+                    catch (Exception e) { 
+                    	System.out.println(e);
+                    }
+                    
+                }
+            }.start();
+        }
+        catch (Exception e) {
+            System.out.println("Problem playing file " + sound);
+            System.out.println(e);
+        }
 	}
 }
