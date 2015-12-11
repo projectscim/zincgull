@@ -1,0 +1,3 @@
+# Introduction #
+
+It's sometime in the future, in a post-apocalyptic world with lots of monsters. Think Fallout, although not really, 'cause you dont have a lot of guns, in fact almost none. Guns and rifles are rare and most fights are fought with blades or clubs, or whatever...
